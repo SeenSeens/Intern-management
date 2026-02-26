@@ -1,0 +1,392 @@
+# Copyright (C) 2026 Trương Đình Tuấn
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Quản Lý Thực Tập Sinh 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/intern\n"
+"POT-Creation-Date: 2026-02-09T17:45:56+00:00\n"
+"PO-Revision-Date: 2026-02-10 01:03+0700\n"
+"Last-Translator: Truong Dinh Tuan <tuanpho@tuanpho>\n"
+"Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.8\n"
+"X-Domain: tbay_intern\n"
+
+#. Plugin Name of the plugin
+#: intern.php
+msgid "Quản Lý Thực Tập Sinh"
+msgstr ""
+
+#. Description of the plugin
+#: intern.php
+msgid "Plugin quản lý thực tập sinh"
+msgstr ""
+
+#. Author of the plugin
+#: intern.php
+msgid "Trương Đình Tuấn"
+msgstr ""
+
+#: app/template-part/task.php:2
+msgid "Tasks for this project"
+msgstr ""
+
+#: app/template-part/task.php:3 app/template-part/task.php:4
+msgid "Add new task"
+msgstr ""
+
+#: app/template-part/task.php:9
+msgid "Add task to project"
+msgstr ""
+
+#: app/template-part/task.php:20 app/views/project/form.php:17
+#: app/views/project/index.php:9 app/views/task/index.php:13
+msgid "Project name"
+msgstr ""
+
+#: app/template-part/task.php:40 app/views/project/form.php:38
+#: app/views/project/index.php:11 app/views/task/new-subtask.php:39
+#: app/views/task/view.php:87
+msgid "Status"
+msgstr ""
+
+#: app/template-part/task.php:56 app/views/project/form.php:54
+msgid "Start date"
+msgstr ""
+
+#: app/template-part/task.php:64 app/template-part/task.php:87
+#: app/views/project/form.php:62 app/views/task/index.php:12
+msgid "End date"
+msgstr ""
+
+#: app/template-part/task.php:74 app/views/project/view.php:150
+#: app/views/project/view.php:172
+msgid "Close"
+msgstr ""
+
+#: app/template-part/task.php:84 app/views/project/index.php:8
+#: app/views/task/index.php:9 app/views/task/view.php:84
+#: app/views/user/index.php:9
+msgid "No"
+msgstr ""
+
+#: app/template-part/task.php:85
+msgid "Task Name"
+msgstr ""
+
+#: app/template-part/task.php:86 app/views/task/index.php:11
+msgid "Date of creation"
+msgstr ""
+
+#: app/template-part/task.php:88
+msgid "Task recipient"
+msgstr ""
+
+#: app/template-part/task.php:89 app/views/task/index.php:14
+#: app/views/task/view.php:88
+msgid "Actions"
+msgstr ""
+
+#: app/template-part/task.php:100 app/views/project/index.php:25
+#: app/views/project/view.php:3 app/views/user/index.php:25
+msgid "Edit"
+msgstr ""
+
+#: app/template-part/task.php:103 app/views/project/index.php:28
+#: app/views/user/index.php:28
+msgid "Delete"
+msgstr ""
+
+#: app/template-part/task.php:106 app/views/project/index.php:31
+msgid "View"
+msgstr ""
+
+#: app/template-part/task.php:118 app/template-part/task.php:119
+#: app/views/task/index.php:26
+msgid "Assign work"
+msgstr ""
+
+#: app/template-part/task.php:126
+msgid "No tasks have been created for this project."
+msgstr ""
+
+#: app/views/assign-member-project/create.php:6
+msgid "Edit project members"
+msgstr ""
+
+#: app/views/assign-member-project/create.php:6
+msgid "Add project members"
+msgstr ""
+
+#: app/views/assign-member-project/create.php:11 app/views/project/view.php:140
+msgid "Mentor"
+msgstr ""
+
+#: app/views/assign-member-project/create.php:27 app/views/project/view.php:162
+#: app/views/task/assignees.php:11
+msgid "Intern"
+msgstr ""
+
+#: app/views/assign-member-project/create.php:43 app/views/project/form.php:68
+#: app/views/task/new-subtask.php:65
+msgid "Update"
+msgstr ""
+
+#: app/views/assign-member-project/create.php:43 app/views/project/form.php:68
+#: app/views/project/index.php:3 app/views/task/new-subtask.php:65
+msgid "Add new"
+msgstr ""
+
+#: app/views/assign-member-project/edit.php:2
+msgid "Edit project members:"
+msgstr ""
+
+#: app/views/assign-member-project/edit.php:9
+msgid "Mentors"
+msgstr ""
+
+#: app/views/assign-member-project/edit.php:21
+msgid "Interns"
+msgstr ""
+
+#: app/views/assign-member-project/edit.php:33
+msgid "Update Member"
+msgstr ""
+
+#: app/views/project/form.php:6 app/views/task/new-subtask.php:7
+msgid "Project update"
+msgstr ""
+
+#: app/views/project/form.php:6
+msgid "Add project"
+msgstr ""
+
+#: app/views/project/index.php:2
+msgid "Project list"
+msgstr "Danh sách dự án"
+
+#: app/views/project/index.php:10
+msgid "Creator"
+msgstr ""
+
+#: app/views/project/index.php:12
+msgid "Start time"
+msgstr ""
+
+#: app/views/project/index.php:13
+msgid "End time"
+msgstr ""
+
+#: app/views/project/index.php:14
+msgid "Action"
+msgstr ""
+
+#: app/views/project/view.php:2
+msgid "Project Details:"
+msgstr ""
+
+#: app/views/project/view.php:9
+msgid "Project information"
+msgstr ""
+
+#: app/views/project/view.php:14
+msgid "Project name:"
+msgstr ""
+
+#: app/views/project/view.php:18
+msgid "Describe:"
+msgstr ""
+
+#: app/views/project/view.php:22
+msgid "Project Manager:"
+msgstr ""
+
+#: app/views/project/view.php:26
+msgid "Status:"
+msgstr ""
+
+#: app/views/project/view.php:42
+msgid "Date created:"
+msgstr ""
+
+#: app/views/project/view.php:46
+msgid "Update date:"
+msgstr ""
+
+#: app/views/project/view.php:59 app/views/project/view.php:62
+msgid "Add members to the project."
+msgstr ""
+
+#: app/views/project/view.php:68
+msgid "Mentors have been assigned"
+msgstr ""
+
+#: app/views/project/view.php:74 app/views/project/view.php:103
+msgid "Name"
+msgstr ""
+
+#: app/views/project/view.php:75 app/views/project/view.php:104
+msgid "Project join date"
+msgstr ""
+
+#: app/views/project/view.php:88
+msgid "No instructor has been assigned yet."
+msgstr ""
+
+#: app/views/project/view.php:91
+msgid "Add mentors to the project."
+msgstr ""
+
+#: app/views/project/view.php:97
+msgid "Interns have been assigned"
+msgstr ""
+
+#: app/views/project/view.php:117
+msgid "No interns have been assigned yet."
+msgstr ""
+
+#: app/views/project/view.php:120
+msgid "Add interns to the project."
+msgstr ""
+
+#: app/views/project/view.php:135
+msgid "Add mentor to project"
+msgstr ""
+
+#: app/views/project/view.php:148 app/views/project/view.php:170
+#: app/views/task/assignees.php:21
+msgid "Save"
+msgstr ""
+
+#: app/views/project/view.php:157
+msgid "Add intern to project"
+msgstr ""
+
+#: app/views/task/index.php:2
+msgid "Task list"
+msgstr ""
+
+#: app/views/task/index.php:3
+msgid "Thêm task mới"
+msgstr ""
+
+#: app/views/task/index.php:5
+msgid "Danh sách nhiệm vụ trong dự án"
+msgstr ""
+
+#: app/views/task/index.php:10
+msgid "Task name"
+msgstr ""
+
+#: app/views/task/new-subtask.php:7
+msgid "Add subtask"
+msgstr ""
+
+#: app/views/task/new-subtask.php:18
+msgid "Sub task"
+msgstr ""
+
+#: app/views/task/new-subtask.php:55
+msgid "Deliver to"
+msgstr ""
+
+#: app/views/task/view.php:3
+msgid "Mission details: "
+msgstr ""
+
+#: app/views/task/view.php:80
+msgid "Thêm sub task"
+msgstr ""
+
+#: app/views/task/view.php:85
+msgid "Title"
+msgstr ""
+
+#: app/views/task/view.php:86
+msgid "Description"
+msgstr ""
+
+#: app/views/user/index.php:2
+msgid "Member List"
+msgstr ""
+
+#: app/views/user/index.php:3
+msgid "Add new member"
+msgstr ""
+
+#: app/views/user/index.php:5
+msgid "List of interns"
+msgstr ""
+
+#: app/views/user/index.php:10
+msgid "Avatar"
+msgstr ""
+
+#: app/views/user/index.php:11
+msgid "User name"
+msgstr ""
+
+#: app/views/user/index.php:12
+msgid "Display name"
+msgstr ""
+
+#: app/views/user/index.php:13
+msgid "E-mail"
+msgstr ""
+
+#: app/views/user/index.php:31
+msgid "View profile"
+msgstr ""
+
+#: core/menu.php:15 core/menu.php:16
+msgid "Intern Management"
+msgstr ""
+
+#: core/menu.php:27 core/menu.php:28
+msgid "Dashboard"
+msgstr ""
+
+#: core/menu.php:41
+msgid "List of students"
+msgstr ""
+
+#: core/menu.php:42
+msgid "Student"
+msgstr ""
+
+#: core/menu.php:56
+msgid "Project List"
+msgstr "Danh sách dự án"
+
+#: core/menu.php:57
+msgid "Project"
+msgstr ""
+
+#: core/menu.php:67 core/menu.php:68
+msgid "Thành viên dự án"
+msgstr ""
+
+#: core/menu.php:80
+msgid "Danh sách sinh viên"
+msgstr ""
+
+#: core/menu.php:81
+msgid "Nhiệm vụ"
+msgstr ""
+
+#: plugin.php:57
+#, php-format
+msgid "\"%1$s\" requires \"%2$s\" version %3$s or greater."
+msgstr ""
+
+#: plugin.php:58
+msgid "INTERN MANAGEMENT"
+msgstr ""
+
+#: plugin.php:59
+msgid "PHP"
+msgstr ""

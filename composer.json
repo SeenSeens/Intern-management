@@ -1,0 +1,19 @@
+{
+    "name": "tuanpho/intern",
+    "autoload": {
+        "psr-4": {
+            "InternManagement\\App\\": [ "app/" ],
+            "InternManagement\\Core\\": [ "core/" ]
+        },
+        "classmap": [ "*" ],
+        "files" : [ "plugin.php" ]
+
+    },
+    "authors": [
+        {
+            "name": "SeenSeens",
+            "email": "truongtuan829@gmail.com"
+        }
+    ],
+    "require": {}
+}
