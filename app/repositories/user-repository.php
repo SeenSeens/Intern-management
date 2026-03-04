@@ -2,7 +2,7 @@
 namespace InternManagement\App\Repositories;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class UserRepository extends BaseRepository {
-    private string $table = 'users';
+    protected string $table = 'users';
 
     public function __construct() {
         parent::__construct( $this->table );

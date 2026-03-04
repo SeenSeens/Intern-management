@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 final class Plugin {
 
-    const string VERSION = '1.0.0';
-    const string MINIMUM_PHP_VERSION = '8.0';
+    const VERSION = '1.0.0';
+    const MINIMUM_PHP_VERSION = '8.0';
     private static ?Plugin $_instance = null;
 
     public static function instance(): ?Plugin{
@@ -99,7 +99,8 @@ final class Plugin {
             'toastify-js' => '1.12.0',
             'all.min' => '6.7.2',
             'sweetalert2@11' => '11.26.3',
-            'popup' => '1.0.0'
+            'popup' => '1.0.0',
+            'notify' => '1.0.0'
         ];
         foreach( $scripts as $script => $version ) :
             wp_enqueue_script(INTERN_MANAGEMENT_PREFIX . $script, plugins_url("assets/backend/js/{$script}.js", INTERN_MANAGEMENT_MAIN_FILE), ['jquery'], $version, true);
@@ -114,7 +115,10 @@ final class Plugin {
                 });
             });
         ");
-
+        wp_localize_script('notify', 'internNotifications', [
+            'message' => isset($_GET['msg']) ? sanitize_text_field($_GET['msg']) : '',
+            'type'    => isset($_GET['type']) ? sanitize_text_field($_GET['type']) : 'success',
+        ]);
     }
 
     public function frontend_styles(): void {
@@ -123,4 +127,6 @@ final class Plugin {
     public function frontend_scripts(): void{
     }
 }
+
+
 

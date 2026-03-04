@@ -3,7 +3,7 @@ namespace InternManagement\App\Repositories;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class TaskDetailRepository extends BaseRepository{
-    private string $table = 'intern_task_details';
+    protected string $table = 'intern_task_details';
 
     public function __construct() {
         parent::__construct( $this->table );

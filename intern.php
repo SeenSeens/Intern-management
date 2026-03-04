@@ -39,3 +39,4 @@ function intern(): void {
     Plugin::instance();
 }
 add_action( 'plugins_loaded', 'intern' );
+

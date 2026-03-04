@@ -24,6 +24,7 @@ class Init {
         new Menu();
         // Load Routes
         $this->load_routes();
+
     }
     private function load_routes(): void{
         require_once plugin_dir_path(INTERN_MANAGEMENT_MAIN_FILE) . '/app/routes/web/admin-post.php';
@@ -36,6 +37,12 @@ class Init {
         add_filter('theme_page_templates', [$this, 'register_custom_templates']);
         // Load template từ plugin
         add_filter('template_include', [$this, 'load_custom_template']);
+
+        add_action('init', [ $this, 'rewrite_rule' ]);
+
+        add_filter('query_vars', [ $this, 'add_query_vars' ]);
+
+        add_action('template_redirect', [ $this, 'redirect_to_template' ]);
     }
     // Thêm template vào dropdown trong Page Attributes
     public function register_custom_templates(array $templates): array{
@@ -61,4 +68,28 @@ class Init {
         // Nếu không phải template của mình, trả về template mặc định của WP
         return $template;
     }
+
+    function rewrite_rule() {
+        add_rewrite_rule(
+            '^intern-api-docs/?$',
+            'index.php?intern_api_docs=1',
+            'top'
+        );
+    }
+
+    function add_query_vars ($vars) {
+        $vars[] = 'intern_api_docs';
+        return $vars;
+    }
+
+    function redirect_to_template() {
+        if (get_query_var('intern_api_docs')) {
+            require_once INTERN_MANAGEMENT_PATH . '/templates/api-docs.php';
+            exit;
+        }
+    }
 }
+
+
+
+

@@ -1,9 +1,8 @@
 {
     "name": "tuanpho/intern",
     "autoload": {
-        "psr-4": {
-            "InternManagement\\App\\": [ "app/" ],
-            "InternManagement\\Core\\": [ "core/" ]
+        "psr-7": {
+            "InternManagement\\": [ "*" ]
         },
         "classmap": [ "*" ],
         "files" : [ "plugin.php" ]
@@ -15,5 +14,7 @@
             "email": "truongtuan829@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "zircote/swagger-php": "^6.0"
+    }
 }

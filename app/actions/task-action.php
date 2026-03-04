@@ -1,22 +1,11 @@
 <?php
 namespace InternManagement\App\Actions;
-use InternManagement\Core\Action;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
-class TaskAction extends Action {
+class TaskAction extends BaseAction {
 
-    public function save(array $data){
-        error_log('Gọi TaskAction::save với dữ liệu: ' . print_r($data, true));
-        if (!empty($data['id'])) {
-            $result = $this->service->update($data['id'], $data);
-            error_log('Update result: ' . var_export($result, true));
-            return;
-        }
-        $result = $this->service->create($data);
-        error_log('Create result: ' . var_export($result, true));
+    protected function map_input(): array
+    {
+        // TODO: Implement map_input() method.
     }
-
-    public function delete(int $id){
-        $this->service->delete($id);
-    }
-
 }

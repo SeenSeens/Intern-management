@@ -1,25 +1,27 @@
 <?php
 namespace InternManagement\App\Actions;
-use InternManagement\Core\Action;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
-class ProjectAction extends Action {
+class ProjectAction extends BaseAction {
 
-    public function save(array $data){
-        error_log('Gọi ProjectAction::save với dữ liệu: ' . print_r($data, true));
-        if (!empty($data['id'])) {
-            $result = $this->service->update($data['id'], $data);
-            error_log('Update result: ' . var_export($result, true));
-            return $data['id'];
+    protected array $allow_html = [  ];
+    /**
+     * Validate dữ liệu đầu vào
+     */
+    protected function validate(): array {
+        $errors = [];
+
+        $type = $this->get('action_type', 'save');
+        if ($type !== 'delete') {
+
         }
-        $result = $this->service->create($data);
-        error_log('Create result: ' . var_export($result, true));
-        return $result;
+
+        return $errors;
     }
 
-    public function delete(int $id){
-        $this->service->delete($id);
+
+    protected function map_input(): array
+    {
+        // TODO: Implement map_input() method.
     }
-
-    
-
 }

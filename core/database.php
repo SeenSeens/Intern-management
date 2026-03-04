@@ -37,7 +37,9 @@ class Database {
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `deleted_at` DATETIME DEFAULT NULL,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY status (status),
+            KEY manager_id (manager_id)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_project_mentors} (

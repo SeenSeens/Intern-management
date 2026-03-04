@@ -1,12 +1,13 @@
 <?php
 namespace InternManagement\App\Services;
+use InternManagement\App\Repositories\BaseRepository;
 use InternManagement\App\Services\Interfaces\BaseServiceInterface;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class BaseService implements BaseServiceInterface {
 
-    protected $repository;
+    protected BaseRepository $repository;
 
-    public function __construct($repository) {
+    public function __construct( BaseRepository $repository ) {
         $this->repository = $repository;
     }
 
@@ -30,4 +31,15 @@ class BaseService implements BaseServiceInterface {
         return $this->repository->delete($id);
     }
 
+    public function offset_paginate(int $page = 1 , int $perPage = 10, array $filters = []){
+        return $this->repository->offset_paginate($page, $perPage, $filters);
+    }
+
+    public function cursor_paginate(?int $cursor = null, int $limit = 10, array $filters = []){
+        return $this->repository->cursor_paginate($cursor, $limit, $filters);
+    }
+
+    public function stats(){
+        return $this->repository->stats();
+    }
 }
