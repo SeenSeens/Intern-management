@@ -9,8 +9,44 @@ class TaskController extends ApiController
         parent::__construct();
     }
 
-    protected function register_routes(): void
-    {
-        // TODO: Implement register_routes() method.
+    protected function register_routes(): void{
+        register_rest_route($this->namespace, '/tasks', [
+            [
+                'methods'  => 'GET',
+                'callback' => [$this, 'index'],
+                'permission_callback' => '__return_true',
+                //'permission_callback' => [$this, 'permission']
+            ]
+        ]);
+
+        register_rest_route($this->namespace, '/task', [
+            [
+                'methods'  => 'POST',
+                'callback' => [$this, 'store'],
+                'permission_callback' => '__return_true',
+                //'permission_callback' => [$this, 'permission']
+            ]
+        ]);
+
+        register_rest_route($this->namespace, '/task/(?P<id>\d+)', [
+            [
+                'methods'  => 'GET',
+                'callback' => [$this, 'show'],
+                'permission_callback' => '__return_true'
+            ],
+            [
+                'methods'  => 'PUT',
+                'callback' => [$this, 'update'],
+                'permission_callback' => '__return_true'
+            ],
+            [
+                'methods'  => 'DELETE',
+                'callback' => [$this, 'destroy'],
+                'permission_callback' => '__return_true'
+            ]
+        ]);
+    }
+    private function permission(): bool{
+        return $this->require_login();
     }
 }

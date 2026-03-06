@@ -1,13 +1,6 @@
-Dự án - Xem, Thêm, Sửa, Xóa - Lỗi sửa ( Khi sửa nó thêm mới chứ không cập nhật ) -- Đã sửa
-Thêm thành viên vào dự án - Xem, Thêm, Sửa, Xóa - OK
-Thêm task vào dự án - Xem tất cả các task, Xem tất cả các task theo dự án, Thêm, Sửa, Xóa - Chưa làm sửa, xóa
-Giao task - Xem, Thêm, Sửa, Xóa - Chưa làm xem, sửa, xóa
-Task detail - Chưa làm
-
-- Gửi thông báo về email cho user khi được thêm, thay đổi, xóa vào dự án, task, sắp tới hạn dead line
-- Thống kê dự án trong tuần, tháng, quý, năm.
-- Thống kê intern làm được bao nhiêu task trong tuần, tháng, quý, năm
-- Thống kê pm đang quản lý bao nhiêu dự án.
-
-
-- Intern thấy được những dự án, task của mình
+- 1 lỗi kiến trúc khá lớn trong bảng task_details
+- cách tối ưu DB cho hệ thống task
+- cách query nhanh hơn 5–10 lần
+- Database ERD chuẩn production (đẹp như tài liệu system design)
+- Flow hoạt động của hệ thống (Manager → Mentor → Intern → Task)
+- API Architecture diagram (Vue → WP REST API → Database)

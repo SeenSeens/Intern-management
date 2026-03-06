@@ -23,7 +23,11 @@ class ProjectController extends ApiController{
                 'methods'  => 'GET',
                 'callback' => [$this, 'index'],
                 //'permission_callback' => [$this, 'permission']
-            ],
+                'permission_callback' => '__return_true'
+            ]
+        ]);
+
+        register_rest_route($this->namespace, '/project/', [
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'store'],
@@ -31,7 +35,7 @@ class ProjectController extends ApiController{
             ]
         ]);
 
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/project/(?P<id>\d+)', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'show'],
@@ -59,19 +63,6 @@ class ProjectController extends ApiController{
     }
 
     // LIST (OFFSET OR CURSOR)
-
-    /**
-     * @OA\Get(
-     *     path="/projects",
-     *     summary="Lấy danh sách dự án",
-     *     tags={"Intern"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Danh sách dự án"
-     *     )
-     * )
-     */
     public function index(WP_REST_Request $request){
         $mode = $request->get_param('mode') ?? 'offset';
 
@@ -174,7 +165,7 @@ class ProjectController extends ApiController{
             'manager_id' => $request->get_param('manager_id'),
         ];
     }
-    public function permission(): bool{
+    private function permission(): bool{
         return $this->require_login();
     }
 }

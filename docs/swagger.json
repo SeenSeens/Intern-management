@@ -1,0 +1,734 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Intern Management API",
+    "version": "1.0.0",
+    "description": "API quản lý thực tập sinh - WordPress Plugin"
+  },
+  "servers": [
+    {
+      "url": "/wp-json/intern",
+      "description": "WordPress REST API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "data": { "type": "object" }
+        }
+      },
+      "Projects": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "Phát triển AI Plugin" },
+          "description": { "type": "string", "example": "" },
+          "status": {
+            "type": "string",
+            "enum": [ "in_progress", "waiting", "on_hold", "completed" ],
+            "example": "waiting"
+          },
+          "manager_id": { "type": "integer", "example": 1 },
+          "start_date": { "type": "string", "format": "date","example": "2026-02-03" },
+          "end_date": { "type": "string", "format": "date", "example": "2026-05-03" }
+        }
+      },
+      "Tasks": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "project_id": { "type": "integer" },
+          "title": { "type": "string", "example": "Xây dựng module API" },
+          "description": { "type": "string", "example": "Tạo REST API cho Intern" },
+          "priority": {
+            "type": "string",
+            "enum": [ "low", "medium", "hight", "critical" ],
+            "example": "medium"
+          },
+          "assigned_by": { "type":  "integer" },
+          "status": {
+            "type": "string",
+            "enum": [ "pending", "in_progress", "completed" ],
+            "example": "pending"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-02-03"
+          },
+          "end_date": { "type": "string",
+            "format": "date",
+            "example": "2026-02-05"
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "intern_id": { "type": "integer", "example": 5 },
+          "content": { "type": "string", "example": "Hoàn thành API module" },
+          "created_at": { "type": "string", "example": "2026-02-28 10:53:26" }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/projects": {
+      "get": {
+        "summary": "Lấy danh sách dự án",
+        "tags": ["Project"],
+        "responses": {
+          "200": {
+            "description": "Danh sách dự án",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "id": "5",
+                        "name": "adasd",
+                        "description": "asd",
+                        "status": "waiting",
+                        "manager_id": "1",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-05",
+                        "created_at": "2026-02-28 10:53:26",
+                        "updated_at": "2026-02-28 10:53:26",
+                        "deleted_at": null
+                      },
+                      {
+                        "id": "4",
+                        "name": "asdasdasd",
+                        "description": "asdasdasd",
+                        "status": "in_progress",
+                        "manager_id": "1",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-17",
+                        "created_at": "2026-02-23 23:57:30",
+                        "updated_at": "2026-02-23 23:57:30",
+                        "deleted_at": null
+                      },
+                      {
+                        "id": "3",
+                        "name": "asdasd11",
+                        "description": "asdasdasd11",
+                        "status": "waiting",
+                        "manager_id": "1",
+                        "start_date": "2026-02-09",
+                        "end_date": "2026-02-25",
+                        "created_at": "2026-02-23 22:50:38",
+                        "updated_at": "2026-02-23 22:50:48",
+                        "deleted_at": null
+                      }
+                    ],
+                    "meta": {
+                      "current_page": 1,
+                      "per_page": 10,
+                      "total": 3,
+                      "last_page": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects?page=1&per_page=10": {
+      "get": {
+        "summary": "Lấy danh sách dự án",
+        "tags": ["Project"],
+        "responses": {
+          "200": {
+            "description": "Danh sách dự án",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "id": "5",
+                        "name": "adasd",
+                        "description": "asd",
+                        "status": "waiting",
+                        "manager_id": "1",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-05",
+                        "created_at": "2026-02-28 10:53:26",
+                        "updated_at": "2026-02-28 10:53:26",
+                        "deleted_at": null
+                      },
+                      {
+                        "id": "4",
+                        "name": "asdasdasd",
+                        "description": "asdasdasd",
+                        "status": "in_progress",
+                        "manager_id": "1",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-17",
+                        "created_at": "2026-02-23 23:57:30",
+                        "updated_at": "2026-02-23 23:57:30",
+                        "deleted_at": null
+                      },
+                      {
+                        "id": "3",
+                        "name": "asdasd11",
+                        "description": "asdasdasd11",
+                        "status": "waiting",
+                        "manager_id": "1",
+                        "start_date": "2026-02-09",
+                        "end_date": "2026-02-25",
+                        "created_at": "2026-02-23 22:50:38",
+                        "updated_at": "2026-02-23 22:50:48",
+                        "deleted_at": null
+                      }
+                    ],
+                    "meta": {
+                      "current_page": 1,
+                      "per_page": 10,
+                      "total": 3,
+                      "last_page": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project": {
+      "post": {
+        "summary": "Tạo dự án",
+        "tags": ["Project"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "description",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["in_progress", "waiting", "on_hold", "completed"],
+              "example": "in_progress"
+            }
+          },
+          {
+            "name": "manager_id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer" }
+          },
+          {
+            "name": "start_date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project/{id}": {
+      "get": {
+        "summary": "Xem dự án",
+        "tags": ["Project"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Cập nhật dự án",
+        "tags": ["Project"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "description",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["in_progress", "waiting", "on_hold", "completed"],
+              "example": "in_progress"
+            }
+          },
+          {
+            "name": "manager_id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer" }
+          },
+          {
+            "name": "start_date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Xóa dự án",
+        "tags": ["Project"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project/{id}/intern/{id}/score": {
+      "get": {
+        "summary": "Xem điểm dự án",
+        "tags": ["Project"]
+      }
+    },
+    "/project/{id}/mentor": {
+      "post": {
+        "summary": "Thêm mentor dự án",
+        "tags": ["Project-Mentor"]
+      },
+      "put": {
+        "summary": "Cập nhật mentor dự án",
+        "tags": ["Project-Mentor"]
+      },
+      "get": {
+        "summary": "Xem mentor dự án",
+        "tags": ["Project-Mentor"]
+      }
+    },
+    "/project/{id}/member/{id}": {
+      "delete": {
+        "summary": "Xóa mentor dự án",
+        "tags": ["Project-Mentor"]
+      }
+    },
+    "/project/{id}/intern": {
+      "post": {
+        "summary": "Thêm intern dự án",
+        "tags": ["Project-Intern"]
+      },
+      "put": {
+        "summary": "Cập nhật intern dự án",
+        "tags": ["Project-Intern"]
+      },
+      "get": {
+        "summary": "Xem intern dự án",
+        "tags": ["Project-Intern"]
+      }
+    },
+    "/project/{id}/intern/{id}": {
+      "delete": {
+        "summary": "Xóa intern dự án",
+        "tags": ["Project-Intern"]
+      }
+    },
+    "/members": {
+      "get": {
+        "summary": "Lấy danh sách thành viên",
+        "tags": ["Member"],
+        "responses": {
+          "200": {
+            "description": "Danh sách thành viê n",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "id": 1,
+                        "display_name": "Nguyen Van A",
+                        "role": "intern",
+                        "email": "a@example.com"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member": {
+      "post": {
+        "summary": "Thêm thành viên",
+        "tags": ["Member"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/{id}": {
+      "post": {
+        "summary": "Xem thành viên",
+        "tags": ["Member"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Cập nhật thành viên",
+        "tags": ["Member"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Xóa thành viên",
+        "tags": ["Member"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "summary": "Lấy danh sách nhiệm vụ",
+        "tags": ["Task"],
+        "responses": {
+          "200": {
+            "description": "Danh sách nhiệm vụ",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "id": 1,
+                        "project_id": 1,
+                        "title": "Xây dựng module API",
+                        "description": "Tạo REST API cho Intern",
+                        "priority": "medium",
+                        "assigned_by": 1,
+                        "status": "pending",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-05"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/{id}": {
+      "post": {
+        "summary": "Tạo nhiệm vụ",
+        "tags": ["Task"],
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "title",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "description",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "priority",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [ "low", "medium", "high", "critical" ],
+              "example": "low"
+            }
+          },
+          {
+            "name" : "assigned_by",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [ "pending", "in_progress", "completed" ],
+              "example" : "pending"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Cập nhật nhiệm vụ",
+        "tags": ["Task"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Xóa nhiệm vụ",
+        "tags": ["Task"],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content" : {
+              "application/json": {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/{id}/assignees": {
+      "post": {
+        "summary": "Thêm intern nhiệm vụ",
+        "tags": ["Task-Assignees"]
+      },
+      "get": {
+        "summary": "Xem intern nhiệm vụ",
+        "tags": ["Task-Assignees"]
+      },
+      "put": {
+        "summary": "Cập nhật intern nhiệm vụ",
+        "tags": ["Task-Assignees"]
+      }
+    },
+    "/task/{id}/assignees/{id}": {
+      "delete": {
+        "summary": "Xóa intern nhiệm vụ",
+        "tags": ["Task-Assignees"]
+      }
+    },
+    "/task/{id}/detail": {
+      "get": {
+        "summary": "Lấy task detail",
+        "tags": ["Task-Detail"]
+      },
+      "post": {
+        "summary": "Thêm task detail",
+        "tags": ["Task-Detail"]
+      }
+    },
+    "/task-detail/{id}": {
+      "put": {
+        "summary": "Cập nhật task detail",
+        "tags": ["Task-Detail"]
+      },
+      "delete": {
+        "summary": "Xóa task detail",
+        "tags": ["Task-Detail"]
+      }
+    },
+    "/task/{id}/report": {
+      "get": {
+        "summary": "",
+        "tags": ["Task-Report"]
+      }
+    },
+    "/reports": {
+      "get": {
+        "summary": "Lấy danh sách báo cáo",
+        "tags": ["Report"],
+        "responses": {
+          "200": {
+            "description": "Danh sách report",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "id": 1,
+                        "intern_id": 5,
+                        "content": "Hoàn thành API module",
+                        "created_at": "2026-02-28 10:53:26"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/{id}/score": {
+      "post": {
+        "summary": "Tính điểm task",
+        "tags": ["Task-Score"]
+      }
+    }
+  }
+}

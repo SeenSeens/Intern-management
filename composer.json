@@ -1,8 +1,8 @@
 {
     "name": "tuanpho/intern",
     "autoload": {
-        "psr-7": {
-            "InternManagement\\": [ "*" ]
+        "psr-4": {
+            "InternManagement\\": [ "app/" ]
         },
         "classmap": [ "*" ],
         "files" : [ "plugin.php" ]
@@ -15,6 +15,8 @@
         }
     ],
     "require": {
-        "zircote/swagger-php": "^6.0"
+        "zircote/swagger-php": "^6.0",
+        "radebatz/type-info-extras": "^1.0",
+        "doctrine/annotations": "^2.0"
     }
 }
