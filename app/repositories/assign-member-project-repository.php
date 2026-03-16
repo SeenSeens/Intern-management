@@ -5,7 +5,7 @@ class AssignMemberProjectRepository extends BaseRepository {
     public function __construct() {
         parent::__construct('intern_projects');
     }
-    public function syncMembers(int $project_id, array $mentor_ids, array $intern_ids, int $assigned_by) {
+    public function sync_members(int $project_id, array $mentor_ids, array $intern_ids, int $assigned_by) {
         global $wpdb;
         $mentor_table = "{$wpdb->prefix}intern_project_mentors";
         $intern_table = "{$wpdb->prefix}intern_project_interns";
@@ -30,9 +30,4 @@ class AssignMemberProjectRepository extends BaseRepository {
             ]);
         }
     }
-
-
-
-
-
 }

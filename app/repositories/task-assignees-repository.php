@@ -8,7 +8,7 @@ class TaskAssigneesRepository extends BaseRepository{
         parent::__construct( $this->table );
     }
 
-    public function getInternAssignByTaskId( int $task_id ) {
+    public function get_intern_assign_by_task_id( int $task_id ) {
         global $wpdb;
         $table_task_assignees = $wpdb->prefix . $this->table;
         return $this->db->get_results(

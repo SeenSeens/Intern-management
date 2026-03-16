@@ -9,6 +9,8 @@ use InternManagement\App\Services\TaskAssigneesService;
 use InternManagement\App\Services\TaskDetailService;
 use InternManagement\App\Services\TaskService;
 use InternManagement\Core\Controller;
+use InternManagement\Core\Helper;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 class TaskController extends Controller{
     private TaskAction $action;
@@ -29,7 +31,7 @@ class TaskController extends Controller{
     }
 
     public function index(){
-        $tasks = $this->service->allTasks();
+        $tasks = $this->service->all_tasks();
         $this->render('task/index', compact('tasks'));
     }
 
@@ -60,8 +62,8 @@ class TaskController extends Controller{
             'priority' => sanitize_text_field($_POST['priority'] ?? ''),
             'assigned_by' => get_current_user_id(),
             'status' => sanitize_text_field($_POST['status'] ?? 'pending'),
-            'start_date' => DateHelper::formatDatetimeLocal($_POST['start_date'] ?? ''),
-            'end_date' => DateHelper::formatDatetimeLocal($_POST['end_date'] ?? ''),
+            'start_date' => Helper::format_date_time_local($_POST['start_date'] ?? ''),
+            'end_date' => Helper::format_date_time_local($_POST['end_date'] ?? ''),
         ];
         $this->action->save($data);
         wp_redirect(admin_url('admin.php?page=intern-project'));
@@ -70,15 +72,15 @@ class TaskController extends Controller{
     public function view(){
         $id = (int)($_GET['task_id'] ?? 0);
         $task = $this->service->find($id); // Lấy thông tin task
-        $internsAssignTask = $this->taskAssigneesService->getInternAssignByTaskId($id); // Lấy danh intern đã được thêm vào dự án
+        $internsAssignTask = $this->taskAssigneesService->get_intern_assign_by_task_id($id); // Lấy danh intern đã được thêm vào dự án
         $taskDetails = $this->taskDetailService->all(); // Lấy danh sách check list công việc
         $this->render('task/view', compact('task', 'internsAssignTask', 'taskDetails'));
     }
-    public function taskAssignees(){
+    public function task_assignees(){
         $id = (int)($_POST['task_id'] ?? $_GET['task_id'] ?? 0);
         $project_id = (int)($_POST['project_id'] ?? $_GET['project_id'] ?? 0);
-        $task = $this->service->getProjectIdByTaskId($id);
-        $interns = $this->projectInternService->getProjectInterns($project_id);
+        $task = $this->service->get_project_id_by_task_id($id);
+        $interns = $this->projectInternService->get_project_interns($project_id);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             check_admin_referer('assign_task_action');
             $internIds = $_POST['intern_ids'] ?? [];
@@ -96,9 +98,9 @@ class TaskController extends Controller{
         $this->render('task/assignees', compact('interns', 'id'));
     }
 
-    public function newSubtask() {
+    public function new_subtask() {
         $id = (int)($_GET['task_id'] ?? 0);
-        $interns = $this->taskAssigneesService->getInternAssignByTaskId($id);
+        $interns = $this->taskAssigneesService->get_intern_assign_by_task_id($id);
         $this->render('task/new-subtask', compact('interns'));
     }
 }

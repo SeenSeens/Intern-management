@@ -1,5 +1,15 @@
 <script setup>
+import {onMounted} from "vue";
+import {useUserStore} from "@/stores/userStore.js";
 
+const userStore = useUserStore()
+onMounted(async () => {
+  try {
+    await userStore.fetchUsers()
+  } catch (err) {
+    console.error("API Error:", err);
+  }
+});
 </script>
 
 <template>
@@ -59,39 +69,28 @@
             <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
           </th>
           <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Họ và tên</th>
-          <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Mã số</th>
           <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vai trò</th>
           <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
-          <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Số điện thoại</th>
-          <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Dự án đang tham gia</th>
           <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Thao tác</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group" v-for="(user, index) in userStore.users" :key="user.id">
           <td class="px-6 py-4">
             <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
           </td>
           <td class="px-6 py-4">
             <div class="flex items-center gap-3">
-              <img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuLRoIYmP61pdkntn0XwGftJOapRZjR-7i9N0406nHYh51G3mVHOODa1E7MJ__hW01n1H2H0K5MvkpeTLlqBNq2Zb8OAUgatVyy5Pcjtkso8LR7kN-RdeAdC2Ow_d_MeK9mz6bjQOV5ROHwSLpHE1oucVNKAV0rwic_br7rY0_L4dgFhoy-mPZReUIeHewYZdyVs9geG95-SxnM8R3CrUlsvghylEDVdKUUtCbsQnHdCdEgqBHXQIillef8UKHvWWLfag0mVWKpdE"/>
+              <img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" :src="user.avatar"/>
               <div>
-                <div class="font-medium text-slate-900 dark:text-white text-sm">Nguyễn Văn A</div>
-                <div class="text-xs text-slate-500">Frontend Dev</div>
+                <div class="font-medium text-slate-900 dark:text-white text-sm">{{ user.name }}</div>
               </div>
             </div>
           </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">INT-2023-001</td>
           <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                        Intern
-                                    </span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">{{ user.role }}</span>
           </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">nguyenvana@example.com</td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">0901234567</td>
-          <td class="px-6 py-4">
-            <span class="text-sm text-slate-700 dark:text-slate-300">Redesign Dashboard</span>
-          </td>
+          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{{ user.email }}</td>
           <td class="px-6 py-4 text-right">
             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button class="p-1.5 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors" title="Chỉnh sửa">
@@ -99,147 +98,6 @@
               </button>
               <button class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors" title="Xóa">
                 <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-          <td class="px-6 py-4">
-            <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDosg9RlhzTwllBULA4ldOE2k0kwHchgkMwH1aIIm-qB1wyAhIszD7sex0u4y8B8c7iMUGM_-6x123Td5yfe4M_OdN1yhUz75mfokjK7PrIgsJ4Z4QT6QS_9hzS-NmJuFzg5u5oCcHhLWrGg9deM8hLzeT3hfuPzJXOwbMdq9QOS0dNaETKY9SB3I_GC3R71Y_KohjJ0ebqpEXfELgwPfXuVhkzo4v4yVlbHEEYOhF9--T8o_c261gUqN-OgbCrpX4iPs-fsO6_DB4"/>
-              <div>
-                <div class="font-medium text-slate-900 dark:text-white text-sm">Trần Thị B</div>
-                <div class="text-xs text-slate-500">Backend Dev</div>
-              </div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">INT-2023-002</td>
-          <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                        Intern
-                                    </span>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">tranthib@example.com</td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">0909876543</td>
-          <td class="px-6 py-4">
-            <span class="text-sm text-slate-700 dark:text-slate-300">Backend Services</span>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button class="p-1.5 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors" title="Chỉnh sửa">
-                <span class="material-symbols-outlined text-lg">edit</span>
-              </button>
-              <button class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors" title="Xóa">
-                <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-          <td class="px-6 py-4">
-            <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCStF-TP6XUvOG7s9GMEa-GkVGR0vnuXlGg4bS3_FiFp2PBoLdxsFmcqsr5BWjwKSonxEMKa55MQCfF0VlZAbzB1kuJNxj2Ao5NUOJrBgBRPpn0_0F7c9oDCYjXMIVZn6llX9bCo9z2xPSPelPq7xRQ8gQbqcIFBWCyHucREL-_s2uEva8-9rDcdor3C4jreEDjnxnBTQ9SuGKd4aSXIYIRmHGFxktaH5GXDCOM54v9_pea4V1S4rj1i05vnc0ZySqE3d_JMTz_NDE"/>
-              <div>
-                <div class="font-medium text-slate-900 dark:text-white text-sm">Lê Văn C</div>
-                <div class="text-xs text-slate-500">Security Analyst</div>
-              </div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">INT-2023-005</td>
-          <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                        Intern
-                                    </span>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">levanc@example.com</td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">0912345678</td>
-          <td class="px-6 py-4">
-            <span class="text-sm text-slate-700 dark:text-slate-300">Security Audit</span>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button class="p-1.5 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors" title="Chỉnh sửa">
-                <span class="material-symbols-outlined text-lg">edit</span>
-              </button>
-              <button class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors" title="Xóa">
-                <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-          <td class="px-6 py-4">
-            <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">
-                PM
-              </div>
-              <div>
-                <div class="font-medium text-slate-900 dark:text-white text-sm">Phạm Minh D</div>
-                <div class="text-xs text-slate-500">Project Manager</div>
-              </div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">MTR-2023-012</td>
-          <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
-                                        Mentor
-                                    </span>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">phamminhd@example.com</td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">0933333333</td>
-          <td class="px-6 py-4">
-            <span class="text-sm text-slate-700 dark:text-slate-300">Quản lý chung</span>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button class="p-1.5 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors" title="Chỉnh sửa">
-                <span class="material-symbols-outlined text-lg">edit</span>
-              </button>
-              <button class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors" title="Xóa">
-                <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-          <td class="px-6 py-4">
-            <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300 flex items-center justify-center">
-                <span class="material-symbols-outlined text-xl">person</span>
-              </div>
-              <div>
-                <div class="font-medium text-slate-900 dark:text-white text-sm">Hoàng Văn E</div>
-                <div class="text-xs text-slate-500">System Admin</div>
-              </div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">ADM-2023-001</td>
-          <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
-                                        Admin
-                                    </span>
-          </td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">hoangvane@example.com</td>
-          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">0944444444</td>
-          <td class="px-6 py-4">
-            <span class="text-sm text-slate-400 dark:text-slate-500 italic">--</span>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button class="p-1.5 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors" title="Chỉnh sửa">
-                <span class="material-symbols-outlined text-lg">edit</span>
               </button>
             </div>
           </td>

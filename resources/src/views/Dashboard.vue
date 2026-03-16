@@ -1,5 +1,21 @@
 <script setup>
+import {onMounted} from "vue";
+import {useUserStore} from "@/stores/userStore.js";
+import {useProjectStore} from "@/stores/projectStore.js";
+import {useTaskStore} from "@/stores/taskStore.js";
 
+const userStore = useUserStore();
+const projectStore = useProjectStore();
+const taskStore = useTaskStore();
+onMounted(async () => {
+  try {
+    await userStore.countUsersRoles()
+    await projectStore.fetchProjects()
+    await taskStore.fetchTasks()
+  } catch (error) {
+    return error
+  }
+})
 </script>
 
 <template>
@@ -23,21 +39,21 @@
     <div class="bg-blue-500 rounded-xl p-6 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden group">
       <div class="relative z-10">
         <p class="text-blue-100 text-sm font-medium mb-1">Sinh viên</p>
-        <h3 class="text-3xl font-bold">3</h3>
+        <h3 class="text-3xl font-bold">{{ userStore.countUser.intern }}</h3>
       </div>
       <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/10 group-hover:scale-110 transition-transform">groups</span>
     </div>
     <div class="bg-emerald-500 rounded-xl p-6 text-white shadow-lg shadow-emerald-500/20 relative overflow-hidden group">
       <div class="relative z-10">
         <p class="text-emerald-100 text-sm font-medium mb-1">Dự án</p>
-        <h3 class="text-3xl font-bold">2</h3>
+        <h3 class="text-3xl font-bold">{{ projectStore.statistics.total }}</h3>
       </div>
       <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/10 group-hover:scale-110 transition-transform">folder_open</span>
     </div>
     <div class="bg-amber-500 rounded-xl p-6 text-white shadow-lg shadow-amber-500/20 relative overflow-hidden group">
       <div class="relative z-10">
         <p class="text-amber-100 text-sm font-medium mb-1">Nhiệm vụ</p>
-        <h3 class="text-3xl font-bold">4</h3>
+        <h3 class="text-3xl font-bold">{{ taskStore.statistics.total }}</h3>
       </div>
       <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/10 group-hover:scale-110 transition-transform">task</span>
     </div>

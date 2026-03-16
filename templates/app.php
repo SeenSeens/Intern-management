@@ -7,11 +7,11 @@
     <title>Hệ thống IMS</title>
     <link rel="stylesheet" crossorigin href="<?= INTERN_MANAGEMENT_URL . 'resources/dist/css/ims-style.css' ?>">
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden">
-<div class="flex h-screen" id="app"></div>
+<body>
+<div id="app"></div>
 <script>
     window.InternApp = {
-        api_url: "<?php echo rest_url('intern/'); ?>",
+        api_url: "<?php echo rest_url(); ?>",
         nonce: "<?php echo wp_create_nonce('wp_rest'); ?>"
     };
 </script>

@@ -7,20 +7,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        primary: "#3b82f6",
-        "background-light": "#f8fafc",
-        "background-dark": "#0f172a",
-      },
-      fontFamily: {
-        display: ["Inter", "sans-serif"],
-        body: ["Inter", "sans-serif"],
-      },
-    },
-  },
   plugins: [
     vue(),
     vueDevTools(),
@@ -47,6 +33,17 @@ export default defineConfig({
           }
           return 'media/[name].[ext]';
         }
+      }
+    }
+  },
+  server: {
+    host: 'plugin.wordpress.local',
+    port: 5173,
+    proxy: {
+      '^/(wp-json|wp-admin|wp-login.php)': {
+        target: 'http://plugin.wordpress.local',
+        changeOrigin: true,
+        secure: false
       }
     }
   }

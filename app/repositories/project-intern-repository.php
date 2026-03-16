@@ -7,7 +7,7 @@ class ProjectInternRepository extends BaseRepository {
         parent::__construct( $this->table );
     }
 
-    public function getProjectInterns(int $project_id){
+    public function get_project_interns(int $project_id){
         global $wpdb;
         $table_project_interns = $wpdb->prefix . $this->table;
         $users_table = $wpdb->users;
@@ -20,7 +20,7 @@ class ProjectInternRepository extends BaseRepository {
         return $wpdb->get_results($wpdb->prepare($sql, $project_id));
     }
 
-    public function addIntern(int $project_id, int $intern_id, int $assigned_by) {
+    public function add_intern(int $project_id, int $intern_id, int $assigned_by) {
         global $wpdb;
         $result = false;
         $exists = $wpdb->get_var($wpdb->prepare(
@@ -40,7 +40,7 @@ class ProjectInternRepository extends BaseRepository {
         return (bool) $result;
     }
 
-    public function getInternsByProject(int $project_id) {
+    public function get_interns_by_project(int $project_id) {
         $table = $this->db->prefix . 'intern_project_interns';
         return $this->db->get_results($this->db->prepare("
             SELECT u.ID, u.display_name, pi.created_at
@@ -50,7 +50,7 @@ class ProjectInternRepository extends BaseRepository {
         ", $project_id), OBJECT);
     }
 
-    public function syncInterns(int $project_id, array $intern_ids, int $assigned_by) {
+    public function sync_interns(int $project_id, array $intern_ids, int $assigned_by) {
         global $wpdb;
         $table = "{$wpdb->prefix}intern_project_interns";
         $wpdb->delete($table, ['project_id' => $project_id]);
@@ -65,7 +65,7 @@ class ProjectInternRepository extends BaseRepository {
         }
     }
 
-    public function removeIntern(int $project_id, int $intern_id): bool {
+    public function remove_intern(int $project_id, int $intern_id): bool {
         global $wpdb;
         return (bool) $wpdb->delete("{$wpdb->prefix}intern_project_interns", [
             'project_id' => $project_id,

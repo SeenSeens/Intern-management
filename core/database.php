@@ -2,18 +2,14 @@
 namespace InternManagement\Core;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class Database {
-    private static ?Database $instance = null;
-    private function __construct() {
-        add_action('init', [$this, 'create_tables']);
-    }
-    public static function instance(): self {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+
+    public static function activate(){
+        self::create_tables();
+        //self::seed_data();
+        flush_rewrite_rules();
     }
 
-    public static function create_tables(): void{
+    public static function create_tables(){
         
         global $wpdb;
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -27,7 +23,7 @@ class Database {
         $table_task_details = $wpdb->prefix . 'intern_task_details'; // Bảng chi tiết nhiệm vụ
         $table_reports = $wpdb->prefix . 'intern_reports'; // Bảng báo cáo
         $table_scores = $wpdb->prefix . 'intern_task_scores'; // Bảng điểm
-        $table_report_comments = $wpdb->prefix . 'intern_report_comments';
+        //$table_report_comments = $wpdb->prefix . 'intern_report_comments';
 
         $sql = [];
         $sql[] = "CREATE TABLE {$table_projects} (
@@ -57,8 +53,7 @@ class Database {
             PRIMARY KEY (id),
             KEY `project_id` (`project_id`),
             KEY `mentor_id` (`mentor_id`),
-            KEY `assigned_by` (`assigned_by`),
-            UNIQUE KEY project_mentor_unique (project_id, mentor_id)
+            KEY `assigned_by` (`assigned_by`)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_project_interns} (
@@ -72,8 +67,7 @@ class Database {
             PRIMARY KEY (id),
             KEY `project_id` (`project_id`),
             KEY `intern_id` (`intern_id`),
-            KEY `assigned_by` (`assigned_by`),
-            UNIQUE KEY project_intern_unique (project_id, intern_id)
+            KEY `assigned_by` (`assigned_by`)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_tasks} (
@@ -92,8 +86,7 @@ class Database {
             `deleted_at` DATETIME DEFAULT NULL,
             PRIMARY KEY (`id`),
             KEY `project_id` (`project_id`),
-            KEY `assigned_by` (`assigned_by`),
-            UNIQUE KEY task_user_unique (task_id, user_id)
+            KEY `assigned_by` (`assigned_by`)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_task_assignees} (
@@ -103,10 +96,8 @@ class Database {
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `deleted_at` DATETIME DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `task_assignees_unique` (task_id, user_id)
+            PRIMARY KEY (`id`)
         ) $charset_collate;";
-
 
         $sql[] = "CREATE TABLE {$table_task_details} (
             `id` BIGINT UNSIGNED AUTO_INCREMENT,
@@ -157,14 +148,187 @@ class Database {
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY `intern_id` (intern_id),
-            KEY `task_id` (task_id),
-            UNIQUE KEY task_scores_unique (task_id, intern_id)
+            KEY `task_id` (task_id)
         ) $charset_collate;";
+
         foreach ($sql as $query) {
             dbDelta($query);
         }
     }
-    public static function alter_tables(): void{}
+
+    public static function seed_data(){
+        global $wpdb;
+
+        $table_projects = $wpdb->prefix . 'intern_projects'; // Bảng dự án
+        $table_project_mentors = $wpdb->prefix . 'intern_project_mentors'; // Bảng dự án - người hướng dẫn
+        $table_project_interns = $wpdb->prefix . 'intern_project_interns'; // Bảng dự án - thực tập
+        $table_tasks = $wpdb->prefix . 'intern_tasks'; // Bảng nhiệm  vụ
+        $table_task_assignees = $wpdb->prefix . 'intern_task_assignees'; // Bảng giao nhiệm vụ cho thực tập
+        $table_task_details = $wpdb->prefix . 'intern_task_details'; // Bảng chi tiết nhiệm vụ
+        $table_reports = $wpdb->prefix . 'intern_reports'; // Bảng báo cáo
+        $table_scores = $wpdb->prefix . 'intern_task_scores'; // Bảng điểm
+        //$table_report_comments = $wpdb->prefix . 'intern_report_comments';
+
+        // check nếu đã có data thì bỏ qua
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_projects");
+        if ($count > 0) return;
+
+        $manager_id = 1;
+        $mentor_ids = [2,3,4];
+        $intern_ids = [5,6,7,8,9,10];
+
+        $project_ids = [];
+
+        /*
+        =====================
+        PROJECTS (10)
+        =====================
+        */
+        for ($i=1;$i<=10;$i++){
+
+            $wpdb->insert($table_projects,[
+                'name'=>"Intern Project $i",
+                'description'=>"Project training $i",
+                'status'=>['waiting','in_progress','completed'][array_rand([0,1,2])],
+                'manager_id'=>$manager_id,
+                'start_date'=>"2026-03-01",
+                'end_date'=>"2026-06-01"
+            ]);
+
+            $project_id=$wpdb->insert_id;
+            $project_ids[]=$project_id;
+
+            /*
+            =====================
+            MENTOR
+            =====================
+            */
+            foreach($mentor_ids as $mentor){
+
+                $wpdb->insert($table_project_mentors,[
+                    'project_id'=>$project_id,
+                    'mentor_id'=>$mentor,
+                    'assigned_by'=>$manager_id
+                ]);
+            }
+
+            /*
+            =====================
+            INTERNS
+            =====================
+            */
+            foreach($intern_ids as $intern){
+
+                $wpdb->insert($table_project_interns,[
+                    'project_id'=>$project_id,
+                    'intern_id'=>$intern,
+                    'assigned_by'=>$mentor_ids[array_rand($mentor_ids)]
+                ]);
+            }
+        }
+
+        /*
+        =====================
+        TASKS (~40)
+        =====================
+        */
+        $task_ids=[];
+
+        foreach($project_ids as $project){
+
+            for($t=1;$t<=4;$t++){
+
+                $wpdb->insert($table_tasks,[
+                    'project_id'=>$project,
+                    'title'=>"Task $t Project $project",
+                    'description'=>"Development task",
+                    'priority'=>['low','medium','high'][array_rand([0,1,2])],
+                    'assigned_by'=>$mentor_ids[array_rand($mentor_ids)],
+                    'status'=>['pending','in_progress','completed'][array_rand([0,1,2])]
+                ]);
+
+                $task_id=$wpdb->insert_id;
+                $task_ids[]=$task_id;
+
+                /*
+                =====================
+                TASK ASSIGNEES
+                =====================
+                */
+
+                foreach($intern_ids as $intern){
+
+                    if(rand(0,1)){
+
+                        $wpdb->insert($table_task_assignees,[
+                            'task_id'=>$task_id,
+                            'user_id'=>$intern
+                        ]);
+                    }
+                }
+
+                /*
+                =====================
+                TASK DETAILS
+                =====================
+                */
+
+                for($d=1;$d<=3;$d++){
+
+                    $wpdb->insert($table_task_details,[
+                        'task_id'=>$task_id,
+                        'title'=>"Subtask $d",
+                        'description'=>"Task detail",
+                        'status'=>['pending','completed'][array_rand([0,1])],
+                        'created_by'=>$mentor_ids[array_rand($mentor_ids)]
+                    ]);
+                }
+            }
+        }
+
+        /*
+        =====================
+        REPORTS (~50)
+        =====================
+        */
+
+        foreach($task_ids as $task){
+
+            for($r=1;$r<=2;$r++){
+
+                $intern=$intern_ids[array_rand($intern_ids)];
+
+                $wpdb->insert($table_reports,[
+                    'project_id'=>$project_ids[array_rand($project_ids)],
+                    'task_id'=>$task,
+                    'intern_id'=>$intern,
+                    'report_type'=>['daily','weekly'][array_rand([0,1])],
+                    'title'=>"Report task $task",
+                    'content'=>"Work progress report",
+                    'progress'=>rand(10,100),
+                    'report_date'=>date('Y-m-d'),
+                    'status'=>['submitted','reviewed','approved'][array_rand([0,1,2])]
+                ]);
+            }
+        }
+
+        /*
+        =====================
+        SCORES (~30)
+        =====================
+        */
+
+        for($s=1;$s<=30;$s++){
+
+            $wpdb->insert($table_scores,[
+                'intern_id'=>$intern_ids[array_rand($intern_ids)],
+                'task_id'=>$task_ids[array_rand($task_ids)],
+                'score'=>rand(6,10),
+                'evaluated_by'=>$mentor_ids[array_rand($mentor_ids)],
+                'comment'=>"Good job"
+            ]);
+        }
+    }
     public static function drop_table(): void{
         global $wpdb;
         $tables = self::table_names();
@@ -172,8 +336,6 @@ class Database {
             $wpdb->query("DROP TABLE IF EXISTS $table");
         endforeach;
     }
-
-    private function add_foreign_keys(): void {}
 
     private static function table_names(): array{
         global $wpdb;

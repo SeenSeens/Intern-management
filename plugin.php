@@ -27,9 +27,9 @@ final class Plugin {
             $mofile = WP_PLUGIN_DIR . '/intern/languages/tbay_intern-' . $locale . '.mo';
 
             if ( file_exists( $mofile ) ) {
-                error_log("File dịch tồn tại: " . $mofile);
+                //error_log("File dịch tồn tại: " . $mofile);
             } else {
-                error_log("KHÔNG tìm thấy file dịch tại: " . $mofile);
+                //error_log("KHÔNG tìm thấy file dịch tại: " . $mofile);
             }
         });
         add_action('init', [ $this, 'load_languages'] );

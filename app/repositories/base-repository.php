@@ -1,15 +1,20 @@
 <?php
 namespace InternManagement\App\Repositories;
 use InternManagement\App\Repositories\Interfaces\BaseRepositoryInterface;
+use InternManagement\Core\QueryBuilder;
 use wpdb;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 class BaseRepository implements BaseRepositoryInterface{
+    use QueryBuilder;
     protected wpdb $db;
     protected string $table;
     protected bool $softDelete = true;
+
     public function __construct( string $table ){
         global $wpdb;
         $this->db = $wpdb;
+        $this->rawTable = $table; // Lưu lại tên gốc nếu Trait QueryBuilder cần dùng
         $this->table = $wpdb->prefix . $table;
     }
 
@@ -28,6 +33,7 @@ class BaseRepository implements BaseRepositoryInterface{
         if (!$result) {
             error_log('Insert failed: ' . $this->db->last_error);
             error_log('Dữ liệu truyền vào: ' . print_r($data, true));
+            return 0; // Trả về 0 nếu lỗi thay vì ID trống
         }
         return (int) $this->db->insert_id;
     }
@@ -76,7 +82,7 @@ class BaseRepository implements BaseRepositoryInterface{
             FROM {$this->table}
             {$whereSql}
             ORDER BY {$orderBy} {$direction}
-            LIMIT %d OFFSET %d,
+            LIMIT %d OFFSET %d
         ";
 
         $queryParams = array_merge($params, [$perPage, $offset]);
@@ -151,7 +157,7 @@ class BaseRepository implements BaseRepositoryInterface{
         );
 
         $nextCursor = count($items) === $limit
-            ? end($items)[$cursorColumn]
+            ? end($items)->$cursorColumn
             : null;
 
         return [

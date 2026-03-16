@@ -1,5 +1,6 @@
 <?php
 namespace InternManagement\App\Controllers\Web;
+use Core\Utils\DateHelper;
 use InternManagement\App\Actions\ProjectAction;
 use InternManagement\App\Services\AssignMemberProjectService;
 use InternManagement\App\Services\ProjectInternService;
@@ -8,7 +9,8 @@ use InternManagement\App\Services\ProjectService;
 use InternManagement\App\Services\TaskAssigneesService;
 use InternManagement\App\Services\TaskService;
 use InternManagement\Core\Controller;
-use InternManagement\App\Helpers\DateHelper;
+use InternManagement\Core\Helper;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 class ProjectController extends Controller {
     private ProjectAction $action;
@@ -57,8 +59,8 @@ class ProjectController extends Controller {
 
     public function store(){
         check_admin_referer('save_project_action'); // Chỉ nếu dùng nonce
-        $start_date = DateHelper::formatDatetimeLocal($_POST['start_date'] ?? '');
-        $end_date = DateHelper::formatDatetimeLocal($_POST['end_date'] ?? '');
+        $start_date = Helper::format_date_time_local($_POST['start_date'] ?? '');
+        $end_date = Helper::format_date_time_local($_POST['end_date'] ?? '');
         if ($start_date && $end_date && strtotime($start_date) > strtotime($end_date)) {
             wp_die('❌ Ngày bắt đầu không được lớn hơn ngày kết thúc');
         }
@@ -88,17 +90,17 @@ class ProjectController extends Controller {
             wp_die('Dự án không tồn tại');
         }
         $project = $this->service->find($id);
-        $mentors = $this->projectMentorService->getMentors($id);
-        $interns = $this->projectInternService->getInterns($id);
+        $mentors = $this->projectMentorService->get_mentors($id);
+        $interns = $this->projectInternService->get_interns($id);
         $allMentors = get_users(['role' => 'mentor']);
         $allInterns = get_users(['role' => 'intern']);
         $currentMentorIds = array_map(fn($u) => (int)$u->ID, $mentors);
         $currentInternIds = array_map(fn($u) => (int)$u->ID, $interns);
 
-        $tasks = $this->taskService->getTasksByProject($id);
+        $tasks = $this->taskService->get_tasks_by_project($id);
         $internAssignedByTask = [];
         foreach ($tasks as $task) {
-            $internAssignedByTask[$task->id] = $this->taskAssigneesService->getInternAssignByTaskId($task->id);
+            $internAssignedByTask[$task->id] = $this->taskAssigneesService->get_intern_assign_by_task_id($task->id);
             echo '<pre>';
             var_dump($internAssignedByTask[$task->id]);
             echo '</pre>';
@@ -107,7 +109,7 @@ class ProjectController extends Controller {
             'internAssignedByTask', 'allMentors', 'allInterns', 'currentMentorIds', 'currentInternIds'));
     }
 
-    public function updateMembers(){
+    public function update_members(){
         check_admin_referer('update_project_members_action');
         $projectId = (int) ($_POST['project_id'] ?? 0);
         $mentorIds = array_map('intval', $_POST['mentor_ids'] ?? []);

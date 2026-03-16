@@ -18,9 +18,9 @@ class DashboardController extends Controller{
     }
 
     public function index(){
-        $countIntern = $this->userService->countInterns(); // Lấy sl sinh viên
-        $countProject = $this->projectService->countProject(); // Lấy sl dự án
-        $countTask = $this->taskService->countTask(); // Lấy sl nhiệm vụ
+        $countIntern = $this->userService->count_interns(); // Lấy sl sinh viên
+        $countProject = $this->projectService->count_project(); // Lấy sl dự án
+        $countTask = $this->taskService->count_task(); // Lấy sl nhiệm vụ
         // Thống kê task hoàn thành
         // Biểu đồ tiến độ nhiệm vụ
         // Nhiệm vụ sắp đến hạn

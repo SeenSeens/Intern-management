@@ -33,9 +33,9 @@ class ProjectInternController extends Controller {
         $project_id = (int)($_POST['project_id'] ?? 0);
         $intern_ids = $_POST['intern_ids'] ?? [];
         if ($intern_ids  ) :
-            $this->projectInternAction->updateIntern($project_id, $intern_ids, get_current_user_id());
+            $this->projectInternAction->update_intern($project_id, $intern_ids, get_current_user_id());
         endif;
-        $this->projectInternAction->assignIntern($project_id, $intern_ids, get_current_user_id());
+        $this->projectInternAction->assign_intern($project_id, $intern_ids, get_current_user_id());
         wp_redirect(admin_url('admin.php?page=intern-project&action=view&project_id='.$project_id));
         exit;
     }

@@ -8,23 +8,23 @@ class TaskService extends BaseService {
         parent::__construct(new TaskRepository());
     }
 
-    public function allTasks(){
-        return $this->repository->allTasks();
+    public function get_all_tasks(){
+        return $this->repository->get_all_tasks();
     }
 
-    public function getTasksByProject(int $project_id){
-        return $this->repository->getTasksByProject($project_id);
+    public function get_tasks_by_project(int $project_id){
+        return $this->repository->get_tasks_by_project($project_id);
     }
 
-    public function getProjectIdByTaskId(int $task_id){
-        return $this->repository->getProjectIdByTaskId($task_id);
+    public function get_project_id_by_task_id(int $task_id){
+        return $this->repository->get_project_id_by_task_id($task_id);
     }
 
-    public function countTask(){
-        return $this->repository->countTask();
+    public function count_task(){
+        return $this->repository->count_task();
     }
 
-    /*public function tasksAreDueSoon( DateTime $days_ahead ){
-        return $this->repository->tasksAreDueSoon( $days_ahead );
-    }*/
+    public function statistics(){
+        return $this->repository->statistics();
+    }
 }

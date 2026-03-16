@@ -8,7 +8,7 @@ class ProjectMentorRepository extends BaseRepository{
         parent::__construct($this->table);
     }
 
-    public function addMentor(int $project_id, int $mentor_id, int $assigned_by) {
+    public function add_mentor(int $project_id, int $mentor_id, int $assigned_by) {
         global $wpdb;
         $result = false;
         $exists = $wpdb->get_var($wpdb->prepare(
@@ -29,7 +29,7 @@ class ProjectMentorRepository extends BaseRepository{
     }
 
     // ProjectRepository.php
-    public function getMentorsByProject(int $project_id) {
+    public function get_mentors_by_project(int $project_id) {
         $table = $this->db->prefix . 'intern_project_mentors';
         return $this->db->get_results($this->db->prepare("
             SELECT u.ID, u.display_name, pm.created_at
@@ -39,7 +39,7 @@ class ProjectMentorRepository extends BaseRepository{
         ", $project_id), OBJECT);
     }
 
-    public function syncMentors(int $project_id, array $mentor_ids, int $assigned_by) {
+    public function sync_mentors(int $project_id, array $mentor_ids, int $assigned_by) {
         global $wpdb;
         $table = "{$wpdb->prefix}intern_project_mentors";
         $wpdb->delete($table, ['project_id' => $project_id]);
@@ -54,7 +54,7 @@ class ProjectMentorRepository extends BaseRepository{
         }
     }
 
-    public function removeMentor(int $project_id, int $mentor_id): bool {
+    public function remove_mentor(int $project_id, int $mentor_id): bool {
         global $wpdb;
         return (bool) $wpdb->delete("{$wpdb->prefix}intern_project_mentors", [
             'project_id' => $project_id,

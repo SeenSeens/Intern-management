@@ -47,23 +47,32 @@ abstract class Action {
 
         try {
             if (!$this->authorize()) {
-                return $return ? ['error' => 'Unauthorized'] : $this->error('Bạn không có quyền thực hiện hành động này.', 403);
+                return $this->respond([
+                    'error' => 'Unauthorized',
+                    'success' => false,
+                    $this->error('Bạn không có quyền thực hiện hành động này.')
+                ], 403, $return);
             }
 
             $errors = $this->validate();
             if (!empty($errors)) {
-                return $return ? ['error' => 'Invalid data', 'details' => $errors] : $this->error('Dữ liệu không hợp lệ.', 422, $errors);
+                return $this->respond([
+                    'error' => 'Invalid data',
+                    'success' => false,
+                    'details' => $errors,
+                    $this->error('Dữ liệu không hợp lệ.')
+                ], 422, $return);
             }
 
             $result = $this->handle();
 
             // Nếu controller yêu cầu return, thì trả về mảng
             if ($return) {
-                return [
+                return $this->respond( [
                     'success' => true,
                     'message' => is_string($result) ? $result : 'Thực hiện thành công.',
                     'data' => $result
-                ];
+                ], 500, $return);
             }
 
             // Mặc định (gọi qua AJAX) vẫn dùng JSON
@@ -230,5 +239,30 @@ abstract class Action {
      */
     protected function error(string $message, int $status = 400, array $errors = []): void{
         wp_send_json(['success' => false, 'message' => $message, 'errors' => $errors], $status);
+    }
+
+    protected function request_type(): string{
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return 'rest';
+        }
+        if (wp_doing_ajax()) {
+            return 'ajax';
+        }
+        return 'http';
+    }
+
+    protected function respond(array $data, int $status = 200, bool $return = false){
+        if ($return) {
+            return $data;
+        }
+        switch ($this->request_type()) {
+            case 'rest':
+                return new \WP_REST_Response($data, $status);
+            case 'ajax':
+                wp_send_json($data, $status);
+            case 'http':
+            default:
+                return $data;
+        }
     }
 }

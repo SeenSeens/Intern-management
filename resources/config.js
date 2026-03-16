@@ -1,5 +1,2 @@
-if (!window.InternApp) {
-  console.error("InternApp config not found");
-}
-export const API_URL = window.InternApp?.api_url;
-export const NONCE = window.InternApp?.nonce;
+export const API_URL = window.InternApp ? window.InternApp.api_url : 'http://plugin.wordpress.local/wp-json/';
+export const NONCE = window.InternApp ? window.InternApp.nonce : null;

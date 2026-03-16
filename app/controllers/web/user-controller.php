@@ -10,7 +10,7 @@ class UserController extends Controller {
     }
 
     public function index(){
-        $users = $this->service->getUsersByRoles( [ 'project_manager', 'hr', 'mentor', 'intern' ] );
+        $users = $this->service->get_users_by_roles( [ 'project_manager', 'hr', 'mentor', 'intern' ] );
         $grouped = [
             'project_managers' => [],
             'hrs' => [],

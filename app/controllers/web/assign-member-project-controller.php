@@ -21,8 +21,8 @@ class AssignMemberProjectController extends Controller{
 
     public function index(){
         $projectId = (int) ($_GET['id'] ?? 0);
-        $mentors = $this->projectMentorService->getMentors($projectId);
-        $interns = $this->projectInternService->getInterns($projectId);
+        $mentors = $this->projectMentorService->get_mentors($projectId);
+        $interns = $this->projectInternService->get_interns($projectId);
         $this->render('project/members', [
             'mentors' => $mentors,
             'interns' => $interns,
@@ -44,8 +44,8 @@ class AssignMemberProjectController extends Controller{
         }
         $allMentors = get_users(['role' => 'mentor']);
         $allInterns = get_users(['role' => 'intern']);
-        $currentMentors = $this->projectMentorService->getMentors($project_id);
-        $currentInterns = $this->projectInternService->getInterns($project_id);
+        $currentMentors = $this->projectMentorService->get_mentors($project_id);
+        $currentInterns = $this->projectInternService->get_interns($project_id);
         $currentMentorIds = array_map(fn($u) => (int)$u->ID, $currentMentors);
         $currentInternIds = array_map(fn($u) => (int)$u->ID, $currentInterns);
         $this->render('assign-member-project/create', compact('project_id', 'allMentors', 'allInterns', 'currentMentorIds', 'currentInternIds'));
@@ -59,8 +59,8 @@ class AssignMemberProjectController extends Controller{
         if (!current_user_can('edit_intern_projects')) {
             wp_die('Bạn không có quyền');
         }
-        $this->service->removeMentor($project_id, $mentor_id);
-        $this->service->removeIntern($project_id, $intern_id);
+        $this->service->remove_mentor($project_id, $mentor_id);
+        $this->service->remove_intern($project_id, $intern_id);
         wp_redirect(admin_url("admin.php?page=intern-project&action=edit_members&id={$project_id}"));
         exit;
     }
@@ -71,9 +71,9 @@ class AssignMemberProjectController extends Controller{
         $mentor_ids = $_POST['mentor_ids'] ?? [];
         $intern_ids = $_POST['intern_ids'] ?? [];
         if ($mentor_ids || $intern_ids ) :
-            $this->assignMemberProjectAction->updateMembers($project_id, $mentor_ids, $intern_ids, get_current_user_id());
+            $this->assignMemberProjectAction->update_members($project_id, $mentor_ids, $intern_ids, get_current_user_id());
         endif;
-        $this->assignMemberProjectAction->assignMembers($project_id, $mentor_ids, $intern_ids, get_current_user_id());
+        $this->assignMemberProjectAction->assign_members($project_id, $mentor_ids, $intern_ids, get_current_user_id());
         wp_redirect(admin_url('admin.php?page=intern-project'));
         exit;
     }

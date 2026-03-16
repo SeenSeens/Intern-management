@@ -1,11 +1,5 @@
 <?php
-
-use InternManagement\App\Controllers\Api\DashboardController;
-use InternManagement\App\Controllers\Api\ProjectController;
-use InternManagement\App\Controllers\Api\TaskController;
-use InternManagement\App\Controllers\Api\MemberController;
-
-new DashboardController();
-new ProjectController();
-new MemberController();
-new TaskController();
+new \InternManagement\App\Controllers\Api\AuthController;
+new \InternManagement\App\Controllers\Api\ProjectController;
+new \InternManagement\App\Controllers\Api\TaskController;
+new \InternManagement\App\Controllers\Api\UserController;

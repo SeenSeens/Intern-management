@@ -15,8 +15,5 @@
         }
     ],
     "require": {
-        "zircote/swagger-php": "^6.0",
-        "radebatz/type-info-extras": "^1.0",
-        "doctrine/annotations": "^2.0"
     }
 }

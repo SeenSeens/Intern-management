@@ -5,13 +5,6 @@ use DateTime;
 use DateTimeZone;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class Helper {
-
-    /**
-     * @param string $input
-     * @param string $format
-     * @param string $time
-     * @return string|null
-     */
     public static function format_date_time_local(string $input, string $format = 'Y-m-d', string $time = '00:00:00'): ?string{
         $input = sanitize_text_field($input);
         if (empty($input)) return null;

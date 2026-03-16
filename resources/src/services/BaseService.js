@@ -2,7 +2,7 @@ import api from '../../api.js'
 
 class BaseService {
   constructor(resource) {
-    this.resource = resource;
+    this.resource = `/intern/v1/${resource}`;
   }
 
   getAll(params = {}) {

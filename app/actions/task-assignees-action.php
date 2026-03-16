@@ -8,8 +8,7 @@ class TaskAssignessAction extends BaseAction {
         parent::__construct(new TaskAssigneesService());
     }
 
-    protected function map_input(): array
-    {
+    protected function map_input(): array{
         // TODO: Implement map_input() method.
     }
 }

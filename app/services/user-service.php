@@ -7,27 +7,29 @@ class UserService extends BaseService {
         parent::__construct(new UserRepository());
     }
 
-    public function getUsersByRoles( array $roles ){
-        return $this->repository->getUsersByRoles( $roles );
+    public function get_users_by_roles( array $roles ){
+        return $this->repository->get_users_by_roles( $roles );
     }
 
-    public function getAllHRs(){
-        return $this->repository->getAllHRs();
+    public function get_all_hrs(){
+        return $this->repository->get_all_hrs();
     }
 
-    public function getAllPMs(){
-        return $this->repository->getAllPMs();
+    public function get_all_pms(){
+        return $this->repository->get_all_pms();
     }
 
-    public function getAllMentors(){
-        return $this->repository->getAllMentors();
+    public function get_all_mentors(){
+        return $this->repository->get_all_mentors();
     }
 
-    public function getAllInterns(){
-        return $this->repository->getAllInterns();
+    public function get_all_interns(){
+        return $this->repository->get_all_interns();
     }
-
-    public function countInterns(){
-        return $this->repository->countInterns();
+    public function count_interns(){
+        return $this->repository->count_interns();
+    }
+    public function count_users_by_role(array $role){
+        return $this->repository->count_users_by_role($role);
     }
 }

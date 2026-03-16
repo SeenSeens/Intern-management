@@ -17,6 +17,7 @@
  */
 
 
+use InternManagement\Core\Database;
 use InternManagement\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -27,16 +28,16 @@ function intern(): void {
     define( 'INTERN_MANAGEMENT_PATH', plugin_dir_path( __FILE__ ) );
     define( 'INTERN_MANAGEMENT_PREFIX', 'tbay_intern_');
 
-
     // Autoload Composer files
-    if ( file_exists( plugin_dir_path( INTERN_MANAGEMENT_MAIN_FILE ) . 'vendor/autoload.php' ) ) {
-        require_once plugin_dir_path( INTERN_MANAGEMENT_MAIN_FILE ) . 'vendor/autoload.php';
-        error_log('Autoload loaded successfully');
+    if ( file_exists( INTERN_MANAGEMENT_PATH . 'vendor/autoload.php' ) ) {
+        require_once INTERN_MANAGEMENT_PATH . 'vendor/autoload.php';
+        //error_log('Autoload loaded successfully');
     } else {
-        error_log('Autoload file not found');
+        //error_log('Autoload file not found');
     }
 
     Plugin::instance();
+
 }
 add_action( 'plugins_loaded', 'intern' );
 

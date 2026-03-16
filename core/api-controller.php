@@ -11,7 +11,7 @@ abstract class ApiController{
     /**
      * Namespace API (versioning)
      */
-    protected string $namespace = 'intern';
+    protected string $namespace = 'intern/v1/';
 
     /**
      * Tự động đăng ký route khi khởi tạo
@@ -62,7 +62,8 @@ abstract class ApiController{
      * Validate login mặc định
      */
     protected function require_login(): bool{
-        return is_user_logged_in();
+        //return is_user_logged_in();
+        return '__return_true';
     }
 
     /**

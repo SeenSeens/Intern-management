@@ -7,7 +7,7 @@ class TaskAssigneesService extends BaseService {
         parent::__construct(new TaskAssigneesRepository());
     }
 
-    public function getInternAssignByTaskId(int $task_id) {
-        return $this->repository->getInternAssignByTaskId($task_id);
+    public function get_intern_assign_by_task_id(int $task_id) {
+        return $this->repository->get_intern_assign_by_task_id($task_id);
     }
 }

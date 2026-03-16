@@ -9,23 +9,17 @@ const api = axios.create({
   },
   withCredentials: true
 });
-
-api.interceptors.response.use(
-  response => response,
-  error => {
-
-    if (error.response) {
-
-      if (error.response.status === 401) {
-        console.error("Unauthorized - Nonce expired");
-      }
-
-      if (error.response.status === 403) {
-        console.error("Forbidden");
-      }
+/*api.interceptors.response.use(
+  res => res,
+  err => {
+    const url = err.config?.url || ''
+    if (
+      err.response?.status === 401 &&
+      !url.includes('intern/v1/login')
+    ) {
+      window.location = '#/login'
     }
-
-    return Promise.reject(error);
+    return Promise.reject(err)
   }
-);
+)*/
 export default api;
