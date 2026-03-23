@@ -16,11 +16,28 @@ trait QueryBuilder {
 
     // Tự động thêm tiền tố database của WP (vd: wp_)
     public function table( $table ) {
-        $this->rawTable = $this->db->prefix . $table;
+        // nếu có alias: "tasks t"
+        if (str_contains($table, ' ')) {
+            [$name, $alias] = explode(' ', $table);
+
+            $this->rawTable = $name;
+            $this->table = $this->db->prefix . $name . ' ' . $alias;
+
+        } else {
+            $this->rawTable = $table;
+            $this->table = $this->db->prefix . $table;
+        }
         return $this;
     }
     public function from($table){
-        $this->table = $table;
+        if (str_contains($table, ' ')) {
+            [$name, $alias] = explode(' ', $table);
+            $this->rawTable = $name;
+            $this->table = $this->db->prefix . $name . ' ' . $alias;
+        } else {
+            $this->rawTable = $table;
+            $this->table = $this->db->prefix . $table;
+        }
         return $this;
     }
     public function where( $field, $compare, $value ) {
@@ -185,6 +202,7 @@ trait QueryBuilder {
      * CẬP NHẬT DỮ LIỆU (Kết hợp với hàm where)
      */
     public function update( array $data ) {
+        if (empty($this->where)) return false;
         // Tạo chuỗi SET "cột = %s, cột = %s"
         $setList = [];
         $updateBindings = [];
@@ -263,6 +281,7 @@ trait QueryBuilder {
      * RESET CÁC THUỘC TÍNH SAU KHI CHẠY QUERY
      */
     public function resetQuery() {
+        //$this->rawTable = '';
         $this->where = '';
         $this->operator = '';
         $this->selectField = '*';
@@ -271,6 +290,6 @@ trait QueryBuilder {
         $this->innerJoin = '';
         $this->groupConcatFields = [];
         $this->groupBy = '';
-        $this->bindings = []; // Reset cả mảng biến
+        $this->bindings = [];
     }
 }

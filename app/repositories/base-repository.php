@@ -17,10 +17,11 @@ class BaseRepository implements BaseRepositoryInterface{
         $this->rawTable = $table; // Lưu lại tên gốc nếu Trait QueryBuilder cần dùng
         $this->table = $wpdb->prefix . $table;
     }
-
+    protected function not_deleted(): string{
+        return $this->softDelete ? "WHERE deleted_at IS NULL" : "";
+    }
     public function all(){
-        $where = $this->softDelete ? "WHERE deleted_at IS NULL" : "";
-        return $this->db->get_results("SELECT * FROM {$this->table} {$where} ORDER BY created_at DESC");
+        return $this->db->get_results("SELECT * FROM {$this->table} {$this->not_deleted()} ORDER BY created_at DESC");
     }
 
     public function find(int $id) {
