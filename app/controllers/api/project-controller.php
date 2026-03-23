@@ -2,7 +2,10 @@
 namespace InternManagement\App\Controllers\Api;
 
 use InternManagement\App\Actions\ProjectAction;
+use InternManagement\App\Services\ProjectInternService;
+use InternManagement\App\Services\ProjectMentorService;
 use InternManagement\App\Services\ProjectService;
+use InternManagement\App\Services\TaskService;
 use InternManagement\Core\ApiController;
 use InternManagement\Core\Auth;
 use InternManagement\Core\Helper;
@@ -13,10 +16,16 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class ProjectController extends ApiController{
     private ProjectService $projectService;
+    private ProjectMentorService $projectMentorService;
+    private ProjectInternService $projectInternService;
+    private $taskService;
     private ProjectAction $projectAction;
     public function __construct(){
         parent::__construct();
         $this->projectService = new ProjectService();
+        $this->projectMentorService = new ProjectMentorService();
+        $this->projectInternService = new ProjectInternService();
+        $this->taskService = new TaskService();
         $this->projectAction = new ProjectAction();
     }
     protected function register_routes(): void{
@@ -25,9 +34,7 @@ class ProjectController extends ApiController{
                 'methods'  => 'GET',
                 'callback' => [$this, 'index'],
                 'permission_callback' => [$this, 'permission']
-            ]
-        ]);
-        register_rest_route($this->namespace, '/projects/', [
+            ],
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'store'],
@@ -58,14 +65,14 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/intern/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns/(?P<id>\d+)', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_scores'],
                 'permission_callback' => [$this, 'permission']
             ],
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentor', [
+        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentors', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_mentor'],
@@ -82,14 +89,14 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentor/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentors/(?P<id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_mentor'],
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/intern', [
+        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_intern'],
@@ -106,7 +113,7 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/intern/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns/(?P<id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_intern'],
@@ -157,15 +164,16 @@ class ProjectController extends ApiController{
 
     // Show
     public function show(WP_REST_Request $request) {
-        $id = (int) $request['id'];
-
-        $project = $this->projectService->find($id);
-
-        if (!$project) {
-            return $this->error('Project not found', 404);
+        try {
+            $id = (int) $request['id'];
+            $data['project'] = $this->projectService->find($id);
+            $data['mentor'] = $this->projectMentorService->get_mentor_project($id);
+            $data['intern'] = $this->projectInternService->get_intern_project($id);
+            $data['overall'] = $this->taskService->overall_progress($id);
+            return $this->success($data);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage());
         }
-
-        return $this->success($project);
     }
 
     // Store
@@ -258,7 +266,8 @@ class ProjectController extends ApiController{
 
     public function view_project_scores(){}
 
-    public function view_project_mentor(){}
+    public function view_project_mentor(WP_REST_Request $request){
+    }
 
     public function create_project_mentor(){}
 
@@ -266,7 +275,8 @@ class ProjectController extends ApiController{
 
     public function delete_project_mentor(){}
 
-    public function view_project_intern(){}
+    public function view_project_intern(WP_REST_Request $request){
+    }
 
     public function create_project_intern(){}
 

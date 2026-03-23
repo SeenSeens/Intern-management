@@ -11,7 +11,7 @@ abstract class ApiController{
     /**
      * Namespace API (versioning)
      */
-    protected string $namespace = 'intern/v1/';
+    protected string $namespace = 'intern/v1';
 
     /**
      * Tự động đăng ký route khi khởi tạo

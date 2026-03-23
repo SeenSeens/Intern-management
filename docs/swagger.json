@@ -357,7 +357,7 @@
         }
       }
     },
-    "/projects/{id}/intern/{id}/score": {
+    "/projects/{id}/interns/{id}/score": {
       "get": {
         "summary": "Xem điểm dự án",
         "tags": ["Project"],
@@ -387,7 +387,7 @@
         }
       }
     },
-    "/projects/{id}/mentor": {
+    "/projects/{id}/mentors": {
       "post": {
         "summary": "Thêm mentor dự án",
         "tags": ["Project-Mentor"],
@@ -461,7 +461,7 @@
         "tags": ["Project-Mentor"],
         "parameters": [
           {
-            "name": "project_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": { "type":  "integer" }
@@ -479,7 +479,7 @@
         }
       }
     },
-    "/projects/{id}/member/{id}": {
+    "/projects/{id}/members/{id}": {
       "delete": {
         "summary": "Xóa mentor dự án",
         "tags": ["Project-Mentor"],
@@ -509,7 +509,7 @@
         }
       }
     },
-    "/projects/{id}/intern": {
+    "/projects/{id}/interns": {
       "post": {
         "summary": "Thêm intern dự án",
         "tags": ["Project-Intern"],
@@ -556,6 +556,14 @@
       "get": {
         "summary": "Xem intern dự án",
         "tags": ["Project-Intern"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type":  "integer" }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Thành công",
@@ -568,7 +576,7 @@
         }
       }
     },
-    "/projects/{id}/intern/{id}": {
+    "/projects/{id}/interns/{id}": {
       "delete": {
         "summary": "Xóa intern dự án",
         "tags": ["Project-Intern"],
@@ -932,7 +940,7 @@
         }
       }
     },
-    "/task/{id}/report": {
+    "/tasks/{id}/report": {
       "get": {
         "summary": "",
         "tags": ["Task-Report"],
@@ -976,7 +984,7 @@
         }
       }
     },
-    "/task/{id}/score": {
+    "/tasks/{id}/score": {
       "post": {
         "summary": "Tính điểm task",
         "tags": ["Task-Score"],

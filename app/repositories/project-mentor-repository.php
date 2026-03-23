@@ -7,7 +7,18 @@ class ProjectMentorRepository extends BaseRepository{
     public function __construct(){
         parent::__construct($this->table);
     }
-
+    public function get_mentor_project(int $project_id){
+        $users = $this->db->users;
+        $results = $this->from("{$this->table} m")
+            ->select('u.id, u.display_name')
+            ->join("$users u", "u.ID = m.mentor_id")
+            ->where('project_id', '=', $project_id)
+            ->get();
+        foreach ($results as &$user) {
+            $user->avatar = get_avatar_url($user->ID);
+        }
+        return $results;
+    }
     public function add_mentor(int $project_id, int $mentor_id, int $assigned_by) {
         global $wpdb;
         $result = false;
@@ -28,16 +39,6 @@ class ProjectMentorRepository extends BaseRepository{
         return (bool) $result;
     }
 
-    // ProjectRepository.php
-    public function get_mentors_by_project(int $project_id) {
-        $table = $this->db->prefix . 'intern_project_mentors';
-        return $this->db->get_results($this->db->prepare("
-            SELECT u.ID, u.display_name, pm.created_at
-            FROM {$table} pm
-            JOIN {$this->db->users} u ON u.ID = pm.mentor_id
-            WHERE pm.project_id = %d
-        ", $project_id), OBJECT);
-    }
 
     public function sync_mentors(int $project_id, array $mentor_ids, int $assigned_by) {
         global $wpdb;

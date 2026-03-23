@@ -5,8 +5,10 @@ export default new class UserService extends BaseService {
   constructor() {
     super('users');
   }
-  getUsersByRole(){
-    return api.get(`${this.resource}/users_by_role`);
+  getUsersByRole(role){
+    return api.get(`${this.resource}/users_by_role`, {
+      params: { role }
+    });
   }
   countUsersByRole(){
     return api.get(`${this.resource}/count`);

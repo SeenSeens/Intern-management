@@ -15,16 +15,18 @@ trait QueryBuilder {
     protected array $bindings = [];
 
     // Tự động thêm tiền tố database của WP (vd: wp_)
-    public function table( $rawTable ) {
-        $this->rawTable = $this->db->prefix . $rawTable;
+    public function table( $table ) {
+        $this->rawTable = $this->db->prefix . $table;
+        return $this;
+    }
+    public function from($table){
+        $this->table = $table;
         return $this;
     }
     public function where( $field, $compare, $value ) {
         $this->operator = empty($this->where) ? ' WHERE ' : ' AND ';
         if($value === null){
-
             $this->where .= "{$this->operator} {$field} {$compare} NULL";
-
         } else {
             $this->where .= "{$this->operator} {$field} {$compare} %s";
             $this->bindings[] = $value;
@@ -140,8 +142,7 @@ trait QueryBuilder {
             $sqlQuery = $this->db->prepare( $sqlQuery, $this->bindings );
         }
 
-        // Dùng ARRAY_A để trả về mảng kết hợp giống PDO::FETCH_ASSOC
-        $results = $this->db->get_results( $sqlQuery, ARRAY_A );
+        $results = $this->db->get_results( $sqlQuery );
 
         $this->resetQuery();
         return $results ?: false;
@@ -161,7 +162,7 @@ trait QueryBuilder {
             $sqlQuery = $this->db->prepare( $sqlQuery, $this->bindings );
         }
 
-        $result = $this->db->get_row( $sqlQuery, ARRAY_A );
+        $result = $this->db->get_row( $sqlQuery );
 
         $this->resetQuery();
         return $result ?: false;

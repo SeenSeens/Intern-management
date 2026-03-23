@@ -8,17 +8,32 @@ class UserRepository extends BaseRepository {
         parent::__construct( $this->table );
     }
 
-    public function get_users_by_roles( array $roles = [] ): array {
-        if (empty($roles)) return [];
+    public function get_users_by_roles( $roles ) {
         $args = [
-            'role__in' => $roles,
-            'order_by' => 'id',
+            'role' => $roles,
+            'orderby' => 'id',
             'order' => 'ASC',
             'number' => -1,
         ];
-        return get_users($args);
+
+        $user_query = new \WP_User_Query($args);
+
+        $users = [];
+
+        if (!empty($user_query->get_results())) {
+            foreach ($user_query->get_results() as $user) {
+                $users[] = [
+                    'id' => $user->ID,
+                    'name' => $user->display_name,
+                    'email' => $user->user_email,
+                    'avatar' => get_avatar_url($user->ID)
+                ];
+            }
+        }
+
+        return $users;
     }
-    public function count_users_by_role(array $roles): array{
+    public function count_users_by_role(array $roles){
         $user_counts = count_users();
         $result = [];
         foreach ($roles as $role) {
@@ -26,23 +41,8 @@ class UserRepository extends BaseRepository {
         }
         return $result;
     }
-    public function get_all_hrs(): array{
-        return $this->get_users_by_roles(['hr']);
-    }
 
-    public function get_all_pms(): array{
-        return $this->get_users_by_roles(['pm']);
-    }
-
-    public function get_all_mentors(): array{
-        return $this->get_users_by_roles(['mentor']);
-    }
-
-    public function get_all_interns(): array{
-        return $this->get_users_by_roles(['intern']);
-    }
-
-    public function count_interns(): int{
-        return $this->count_users_by_role('intern');
+    public function count_interns(){
+        return $this->count_users_by_role(['intern']);
     }
 }

@@ -7,6 +7,18 @@ class ProjectInternRepository extends BaseRepository {
         parent::__construct( $this->table );
     }
 
+    public function get_intern_project(int $project_id){
+        $users = $this->db->users;
+        $results = $this->from("{$this->table} m")
+            ->select('u.display_name')
+            ->join("$users u", "u.ID = m.intern_id")
+            ->where('project_id', '=', $project_id)
+            ->get();
+        foreach ($results as &$user) {
+            $user->avatar = get_avatar_url($user->ID);
+        }
+        return $results;
+    }
     public function get_project_interns(int $project_id){
         global $wpdb;
         $table_project_interns = $wpdb->prefix . $this->table;

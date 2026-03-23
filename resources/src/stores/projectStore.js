@@ -3,21 +3,13 @@ import ProjectService from '@/services/ProjectService.js'
 export const useProjectStore = defineStore('project', {
   state: () => ({
     projects: [],
+    project: null,
+    mentors: [],
+    interns: [],
     loading: false,
-    meta: {
-      current_page: 1,
-      per_page: 10,
-      total: 0,
-      last_page: 1,
-
-    },
-    statistics: {
-      in_progress: 0,
-      waiting: 0,
-      on_hold: 0,
-      completed: 0,
-      total: 0
-    }
+    meta: [],
+    statistics: [],
+    overall: null
   }),
   actions: {
     async fetchProjects(page = 1) {
@@ -26,13 +18,29 @@ export const useProjectStore = defineStore('project', {
         const response = await ProjectService.getAll()
         const resData = response.data.data
         this.projects = resData.items
-        this.pagination = resData.meta
-        this.currentPage = resData.current_page
-        this.statistics = resData.statistics;
+        this.meta  = resData.meta
+        this.statistics = resData.statistics
       } catch (error) {
         console.error(error)
       }
       this.loading = false
+    },
+
+    async find(id){
+      try {
+        const response = await ProjectService.getById(id)
+        const resData = response.data.data
+        this.project = {
+          ...resData.project,
+          mentors: resData.mentor,
+          interns: resData.intern
+        }
+        this.overall = resData.overall || null
+        return this.project
+      } catch (e) {
+        console.error("find project error:", e)
+        return null
+      }
     },
 
     async createProject(data) {
@@ -48,7 +56,7 @@ export const useProjectStore = defineStore('project', {
 
     async updateProject(id, data) {
       const res = await ProjectService.update(id, data)
-      const index = this.projects.findIndex(p => p.id === id)
+      const index = this.projects.getById(p => p.id === id)
       if (index !== -1) {
         this.projects[index] = res.data
       }
@@ -57,6 +65,6 @@ export const useProjectStore = defineStore('project', {
     async removeProject(id) {
       await ProjectService.delete(id)
       this.projects = this.projects.filter(p => p.id !== id)
-    }
+    },
   }
 })

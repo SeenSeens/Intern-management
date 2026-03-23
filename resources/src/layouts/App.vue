@@ -12,16 +12,14 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <div class="flex h-screen" >
-    <div class="flex h-screen">
-      <Sidebar :collapsed="collapsed"/>
-      <div class="flex-1 flex flex-col min-w-0">
-        <Header @toggleSidebar="toggleSidebar" />
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-background-light dark:bg-background-dark">
-          <RouterView />
-          <Footer/>
-        </main>
-      </div>
+  <div class="flex h-screen">
+    <Sidebar :collapsed="collapsed"/>
+    <div class="flex-1 flex flex-col min-w-0">
+      <Header @toggleSidebar="toggleSidebar" />
+      <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-background-light">
+        <RouterView />
+        <Footer/>
+      </main>
     </div>
   </div>
 </template>

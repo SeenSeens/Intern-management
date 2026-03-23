@@ -17,9 +17,11 @@ class UserController extends ApiController{
 
     protected function register_routes(): void{
         register_rest_route($this->namespace, '/users', [
-            'methods' => 'GET',
-            'callback' => [$this, 'index'],
-            'permission_callback' => [$this, 'permission']
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'index'],
+                'permission_callback' => [$this, 'permission']
+            ],
         ]);
         register_rest_route($this->namespace, '/users/users_by_role', [
             'methods' => 'GET',
@@ -53,43 +55,18 @@ class UserController extends ApiController{
 
         return $this->success( $data, 200 );
     }
-    public function get_users_by_role(WP_REST_Request $request): \WP_Error|WP_REST_Response|\WP_HTTP_Response{
-        $users = $this->userService->get_users_by_roles(['administrator', 'project_manager', 'hr', 'mentor', 'intern']);
+    public function get_users_by_role(WP_REST_Request $request){
+        $role = $request->get_json_params('role') ?? $request->get_params('role');
 
-        $grouped = [
-            'administrator' => [],
-            'project_managers' => [],
-            'hrs' => [],
-            'mentors' => [],
-            'interns' => [],
-        ];
-
-        foreach ($users as $user) {
-            if (in_array('administrator', $user->roles, true)) {
-                $grouped['administrator'][] = $user;
-            }
-
-            if (in_array('intern', $user->roles, true)) {
-                $grouped['interns'][] = $user;
-            }
-
-            if (in_array('mentor', $user->roles, true)) {
-                $grouped['mentors'][] = $user;
-            }
-
-            if (in_array('project_manager', $user->roles, true)) {
-                $grouped['project_managers'][] = $user;
-            }
-
-            if (in_array('hr', $user->roles, true)) {
-                $grouped['hrs'][] = $user;
-            }
+        if (!$role) {
+            return [
+                'success' => false,
+                'message' => 'Role is required'
+            ];
         }
 
-        return rest_ensure_response([
-            'success' => true,
-            'data' => $grouped
-        ]);
+        $users = $this->userService->get_users_by_roles($role);
+        return $this->success($users, 200 );
     }
     public function count_users_by_role(): WP_REST_Response{
         $role = ['administrator', 'project_manager', 'hr', 'mentor', 'intern'];

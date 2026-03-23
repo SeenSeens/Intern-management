@@ -4,12 +4,8 @@ import TaskService from "@/services/TaskService.js";
 export const useTaskStore = defineStore('task', {
   state: () => ({
     tasks: [],
-    statistics: {
-      pending: 0,
-      in_progress: 0,
-      completed: 0,
-      total: 0
-    }
+    statistics: [],
+    upcoming_tasks: []
   }),
   actions: {
     async fetchTasks(){

@@ -50,8 +50,8 @@ class TaskController extends ApiController{
 
     public function index(WP_REST_Request $request){
         $data['items'] = $this->taskService->get_all_tasks();
-        $stats = $this->taskService->statistics();
-        $data['statistics'] = $stats;
+        $data['statistics'] = $this->taskService->statistics();
+        $data['upcoming_tasks'] = $this->taskService->upcoming_tasks(7);
         return $this->success( $data );
     }
     public function store(WP_REST_Request $request){

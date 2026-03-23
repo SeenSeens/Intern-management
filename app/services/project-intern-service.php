@@ -6,7 +6,9 @@ class ProjectInternService extends BaseService{
     public function __construct(){
         parent::__construct(new ProjectInternRepository());
     }
-
+    public function get_intern_project(int $project_id){
+        return $this->repository->get_intern_project($project_id);
+    }
     public function get_project_interns(int $project_id){
         return $this->repository->get_project_interns($project_id);
     }

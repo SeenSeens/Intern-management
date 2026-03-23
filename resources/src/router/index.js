@@ -1,15 +1,16 @@
 import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
 import Dashboard from "@/views/Dashboard.vue";
-import Project from "@/views/Project.vue";
-import Member from "@/views/Member.vue";
+import Project from "@/views/project/Project.vue";
+import Member from "@/views/user/Member.vue";
 import Setting from "@/views/Setting.vue";
-import Task from "@/views/Task.vue";
-import NewProject from "@/views/NewProject.vue";
-import Login from "@/views/Login.vue";
+import Task from "@/views/task/Task.vue";
+import NewProject from "@/views/project/NewProject.vue";
+import Login from "@/views/auth/Login.vue";
 import Auth from "@/layouts/Auth.vue";
 import App from "@/layouts/App.vue";
 import {useAuthStore} from "@/stores/authStore.js";
-import EditProject from "@/views/EditProject.vue";
+import EditProject from "@/views/project/EditProject.vue";
+import DetailProject from "@/views/project/DetailProject.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,11 @@ const router = createRouter({
           component: EditProject
         },
         {
+          path: 'project/view/:id',
+          name: 'project-view',
+          component: DetailProject
+        },
+        {
           path: 'task',
           name: 'task',
           component: Task
@@ -70,7 +76,7 @@ const router = createRouter({
   ],
 })
 
-/*router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   if (!auth.user) {
     await auth.fetchUser()
@@ -88,6 +94,6 @@ const router = createRouter({
     next()
   }
 
-})*/
+})
 
 export default router
