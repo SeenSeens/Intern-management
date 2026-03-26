@@ -19,8 +19,8 @@ class ProjectInternService extends BaseService{
         }
     }
 
-    public function sync_interns(int $project_id, array $intern_ids, int $assigned_by) {
-        return $this->repository->syncInterns($project_id, $intern_ids, $assigned_by);
+    public function sync_project_interns(int $project_id, array $intern_ids, int $assigned_by) {
+        return $this->repository->sync_project_interns($project_id, $intern_ids, $assigned_by);
     }
 
     public function get_interns(int $project_id) {

@@ -51,27 +51,27 @@ trait QueryBuilder {
         return $this;
     }
 
-    public function orWhere( $field, $compare, $value ) {
+    public function or_where( $field, $compare, $value ) {
         $this->operator = empty($this->where) ? ' WHERE ' : ' OR ';
         $this->where .= "{$this->operator} {$field} {$compare} %s";
         $this->bindings[] = $value;
         return $this;
     }
 
-    public function whereLike( $field, $value ) {
+    public function where_like( $field, $value ) {
         $this->operator = empty($this->where) ? ' WHERE ' : ' AND ';
         $this->where .= "{$this->operator} {$field} LIKE %s";
         $this->bindings[] = $value;
         return $this;
     }
 
-    public function whereNull($field){
+    public function where_null($field){
         $this->operator = empty($this->where) ? ' WHERE ' : ' AND ';
         $this->where .= "{$this->operator} {$field} IS NULL";
         return $this;
     }
 
-    public function whereNotNull($field){
+    public function where_not_null($field){
         $this->operator = empty($this->where) ? ' WHERE ' : ' AND ';
         $this->where .= "{$this->operator} {$field} IS NOT NULL";
         return $this;
@@ -90,7 +90,7 @@ trait QueryBuilder {
         return $this;
     }
 
-    public function orderBy( $field, $type = 'ASC' ) {
+    public function order_by( $field, $type = 'ASC' ) {
         $fieldArr = array_filter( explode(',', $field) );
         if ( !empty($fieldArr) && count($fieldArr) >= 2 ) {
             $this->orderBy = "ORDER BY " . implode(', ', $fieldArr);
@@ -100,7 +100,7 @@ trait QueryBuilder {
         return $this;
     }
 
-    public function groupBy( $field ) {
+    public function group_by( $field ) {
         $this->groupBy = "GROUP BY {$field}";
         return $this;
     }
@@ -110,12 +110,12 @@ trait QueryBuilder {
         return $this;
     }
 
-    public function leftJoin($table, $relationship ) {
+    public function left_join($table, $relationship ) {
         $this->innerJoin .= " LEFT JOIN {$table} ON {$relationship} ";
         return $this;
     }
 
-    public function groupConcat($field, $alias = null, $separator = ', ', $distinct = false, $orderBy = null, $condition = null) {
+    public function group_concat($field, $alias = null, $separator = ', ', $distinct = false, $orderBy = null, $condition = null) {
         $gc = "GROUP_CONCAT(";
         if ($distinct) $gc .= "DISTINCT ";
 
@@ -161,7 +161,7 @@ trait QueryBuilder {
 
         $results = $this->db->get_results( $sqlQuery );
 
-        $this->resetQuery();
+        $this->rese_query();
         return $results ?: false;
     }
 
@@ -181,7 +181,7 @@ trait QueryBuilder {
 
         $result = $this->db->get_row( $sqlQuery );
 
-        $this->resetQuery();
+        $this->rese_query();
         return $result ?: false;
     }
 
@@ -190,11 +190,14 @@ trait QueryBuilder {
      */
     public function insert( $data ) {
         $result = $this->db->insert( $this->table, $data );
-        $this->resetQuery();
-        return $result !== false;
+        $this->rese_query();
+        if ($result === false) {
+            return false;
+        }
+        return $this->db->insert_id;
     }
 
-    public function lastId() {
+    public function last_id() {
         return $this->db->insert_id;
     }
 
@@ -222,7 +225,7 @@ trait QueryBuilder {
         }
 
         $result = $this->db->query( $sql );
-        $this->resetQuery();
+        $this->rese_query();
         return $result !== false;
     }
 
@@ -242,45 +245,77 @@ trait QueryBuilder {
         }
 
         $result = $this->db->query( $sql );
-        $this->resetQuery();
+        $this->rese_query();
         return $result !== false;
     }
 
     /**
      * THÊM HOẶC CẬP NHẬT (ON DUPLICATE KEY UPDATE)
+     * @param $data
+     * @param $updateFields
+     * @param $parentId
+     * @param $parentKey
+     * @return bool
      */
-    public function insertOrUpdate( $data, $updateFields = [], $parentId = null, $parentKey = '' ) {
+    public function insert_or_update( $data, $updateFields = [], $parentId = null, $parentKey = '' ) {
         if ( $parentId !== null && $parentKey !== '' ) {
             $data[$parentKey] = $parentId;
         }
 
-        $columns = implode( ', ', array_keys($data) );
-        // Tạo chuỗi placeholder %s, %s, %s tương ứng với số lượng cột
-        $placeholders = implode( ', ', array_fill(0, count($data), '%s') );
+        $columns = [];
+        $placeholders = [];
+        $values = [];
+        foreach ($data as $column => $value) {
+            $columns[] = "`{$column}`";
 
+            if (is_null($value)) {
+                $placeholders[] = "NULL"; // 🔥 NULL thật
+            } elseif (is_int($value)) {
+                $placeholders[] = "%d";
+                $values[] = $value;
+            } elseif (is_float($value)) {
+                $placeholders[] = "%f";
+                $values[] = $value;
+            } else {
+                $placeholders[] = "%s";
+                $values[] = $value;
+            }
+        }
         $updateQuery = '';
         if ( !empty($updateFields) ) {
             $updateSet = [];
             foreach ( $updateFields as $field ) {
-                $updateSet[] = "{$field} = VALUES({$field})";
+                $updateSet[] = "`{$field}` = VALUES(`{$field}`)";
             }
             $updateQuery = 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $updateSet );
         }
 
-        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders}) {$updateQuery}";
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES (%s) %s",
+            $this->table,
+            implode(', ', $columns),
+            implode(', ', $placeholders),
+            $updateQuery
+        );
 
-        // Chuẩn bị các giá trị động
-        $sql = $this->db->prepare( $sql, array_values($data) );
+        if (!empty($values)) {
+            $sql = $this->db->prepare($sql, $values);
+        }
+
         $result = $this->db->query( $sql );
 
-        $this->resetQuery();
+        if ($result === false) {
+            error_log("❌ SQL ERROR: " . $this->db->last_error);
+            error_log("❌ SQL: " . $sql);
+        }
+        $this->rese_query();
         return $result !== false;
     }
 
     /**
      * RESET CÁC THUỘC TÍNH SAU KHI CHẠY QUERY
      */
-    public function resetQuery() {
+    public function rese_query() {
         //$this->rawTable = '';
         $this->where = '';
         $this->operator = '';

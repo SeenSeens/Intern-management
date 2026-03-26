@@ -1,6 +1,7 @@
 <?php
 namespace InternManagement\App\Controllers\Api;
 
+use Exception;
 use InternManagement\App\Actions\ProjectAction;
 use InternManagement\App\Services\ProjectInternService;
 use InternManagement\App\Services\ProjectMentorService;
@@ -171,19 +172,20 @@ class ProjectController extends ApiController{
             $data['intern'] = $this->projectInternService->get_intern_project($id);
             $data['overall'] = $this->taskService->overall_progress($id);
             return $this->success($data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
     // Store
     public function store(WP_REST_Request $request){
+        global $wpdb;
         try {
             $params = $request->get_json_params() ?? $request->get_params();
             $start_date = Helper::format_date_time_local($params['start_date'] ?? '');
             $end_date   = Helper::format_date_time_local($params['end_date'] ?? '');
             if ($start_date && $end_date && strtotime($start_date) > strtotime($end_date)) {
-                throw new \Exception("Ngày bắt đầu không được lớn hơn ngày kết thúc");
+                throw new Exception("Ngày bắt đầu không được lớn hơn ngày kết thúc");
             }
             $data = [
                 'name' => sanitize_text_field($params['name'] ?? ''),
@@ -195,15 +197,50 @@ class ProjectController extends ApiController{
                 'start_date' => $start_date,
                 'end_date' => $end_date,
             ];
-            $id = $this->projectService->create($data);
+            // lấy mentors + interns từ FE
+            $mentor_ids = array_map('intval', $params['mentors'] ?? []);
+            error_log(print_r($mentor_ids, true));
+            $intern_ids = array_map('intval', $params['interns'] ?? []);
+            error_log(print_r($intern_ids, true));
+            $assigned_by = get_current_user_id();
+            // START TRANSACTION
+            $wpdb->query('START TRANSACTION');
+            // tạo project
+            $project_id = $this->projectService->create($data);
+            error_log("project_id". $project_id);
+            if (!$project_id) {
+                throw new Exception("Không thể tạo project");
+            }
+            // sync mentors
+            if (!empty($mentor_ids)) {
+                $this->projectMentorService->sync_project_mentors(
+                    $project_id,
+                    $mentor_ids,
+                    $assigned_by
+                );
+            }
+            // sync interns
+            if (!empty($intern_ids)) {
+                $this->projectInternService->sync_project_interns(
+                    $project_id,
+                    $intern_ids,
+                    $assigned_by
+                );
+            }
+            // COMMIT
+            $wpdb->query('COMMIT');
             return $this->success([
-                'id' => $id
+                'id' => $project_id
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            error_log('❌ ERROR: ' . $e->getMessage());
+            error_log('❌ SQL: ' . $wpdb->last_query);
+            error_log('❌ DB ERROR: ' . $wpdb->last_error);
+            // ROLLBACK nếu lỗi
+            $wpdb->query('ROLLBACK');
             return $this->error($e->getMessage(), 422);
         }
-
     }
 
     // Update
@@ -234,7 +271,7 @@ class ProjectController extends ApiController{
                 'updated' => $updated
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return $this->error($e->getMessage(), 422);
         }
@@ -269,7 +306,13 @@ class ProjectController extends ApiController{
     public function view_project_mentor(WP_REST_Request $request){
     }
 
-    public function create_project_mentor(){}
+    public function create_project_mentor(){
+        try {
+
+        } catch (Exception $e){
+
+        }
+    }
 
     public function update_project_mentor(){}
 

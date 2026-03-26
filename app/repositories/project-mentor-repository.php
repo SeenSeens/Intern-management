@@ -1,6 +1,8 @@
 <?php
 
 namespace InternManagement\App\Repositories;
+use Exception;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 class ProjectMentorRepository extends BaseRepository{
     protected string $table = 'intern_project_mentors';
@@ -19,48 +21,35 @@ class ProjectMentorRepository extends BaseRepository{
         }
         return $results;
     }
-    public function add_mentor(int $project_id, int $mentor_id, int $assigned_by) {
-        global $wpdb;
-        $result = false;
-        $exists = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}intern_project_mentors WHERE project_id = %d AND mentor_id = %d",
-            $project_id, $mentor_id
-        ));
-        if (!$exists) {
-            $result = $wpdb->insert("{$wpdb->prefix}intern_project_mentors", [
-                'project_id' => $project_id,
-                'mentor_id' => $mentor_id,
-                'assigned_by' => $assigned_by,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ]);
-            if (!$result) error_log("[DB Error] addMentor: " . $wpdb->last_error);
-        }
-        return (bool) $result;
-    }
 
-
-    public function sync_mentors(int $project_id, array $mentor_ids, int $assigned_by) {
-        global $wpdb;
-        $table = "{$wpdb->prefix}intern_project_mentors";
-        $wpdb->delete($table, ['project_id' => $project_id]);
+    public function sync_project_mentors(int $project_id, array $mentor_ids, int $assigned_by) {
         foreach ($mentor_ids as $mentor_id) {
-            $wpdb->insert($table, [
-                'project_id' => $project_id,
-                'mentor_id' => $mentor_id,
-                'assigned_by' => $assigned_by,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ]);
+            error_log("👉 Insert mentor: " . $mentor_id);
+            $result = $this->insert_or_update(
+                [
+                    'project_id' => $project_id,
+                    'mentor_id' => $mentor_id,
+                    'assigned_by' => $assigned_by,
+                    'deleted_at' => null
+                ],
+                ['assigned_by', 'deleted_at'] // nếu trùng thì update
+            );
+            if (!$result) {
+                error_log("❌ Mentor insert fail: " . $this->db->last_error);
+                throw new Exception("Insert mentor failed");
+            }
         }
-    }
 
-    public function remove_mentor(int $project_id, int $mentor_id): bool {
-        global $wpdb;
-        return (bool) $wpdb->delete("{$wpdb->prefix}intern_project_mentors", [
-            'project_id' => $project_id,
-            'mentor_id' => $mentor_id,
-        ]);
+        // soft delete những thằng không còn
+        if (!empty($mentor_ids)) {
+            $ids = implode(',', array_map('intval', $mentor_ids));
+            $this->db->query("
+                UPDATE $this->table
+                SET deleted_at = NOW()
+                WHERE project_id = {$project_id}
+                AND mentor_id NOT IN ($ids)
+            ");
+        }
     }
 
 }

@@ -9,7 +9,7 @@ class AssignMemberProjectAction extends BaseAction {
     }
 
     public function update_members($project_id, array $mentor_ids, array $intern_ids, $assigned_by){
-        $this->service->sync_embers($project_id, $mentor_ids, $intern_ids, $assigned_by);
+        $this->service->sync_members($project_id, $mentor_ids, $intern_ids, $assigned_by);
     }
 
 

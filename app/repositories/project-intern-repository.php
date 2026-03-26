@@ -1,5 +1,7 @@
 <?php
 namespace InternManagement\App\Repositories;
+use Exception;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 class ProjectInternRepository extends BaseRepository {
     protected string $table = 'intern_project_interns';
@@ -62,18 +64,34 @@ class ProjectInternRepository extends BaseRepository {
         ", $project_id), OBJECT);
     }
 
-    public function sync_interns(int $project_id, array $intern_ids, int $assigned_by) {
-        global $wpdb;
-        $table = "{$wpdb->prefix}intern_project_interns";
-        $wpdb->delete($table, ['project_id' => $project_id]);
-        foreach ($intern_ids as $internId) {
-            $wpdb->insert($table, [
-                'project_id' => $project_id,
-                'intern_id' => $internId,
-                'assigned_by' => $assigned_by,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ]);
+    public function sync_project_interns(int $project_id, array $intern_ids, int $assigned_by) {
+        foreach ($intern_ids as $intern_id) {
+            error_log("👉 Insert intern: " . $intern_id);
+            $result = $this->table('intern_project_interns')
+                ->insert_or_update(
+                    [
+                        'project_id' => $project_id,
+                        'intern_id' => $intern_id,
+                        'assigned_by' => $assigned_by,
+                        'deleted_at' => null
+                    ],
+                    ['assigned_by', 'deleted_at']
+            );
+            if (!$result) {
+                error_log("❌ Intern insert fail: " . $this->db->last_error);
+                throw new Exception("Insert intern failed");
+            }
+        }
+
+        if (!empty($intern_ids)) {
+            $ids = implode(',', array_map('intval', $intern_ids));
+
+            $this->db->query("
+                UPDATE {$this->db->prefix}intern_project_interns
+                SET deleted_at = NOW()
+                WHERE project_id = {$project_id}
+                AND intern_id NOT IN ($ids)
+            ");
         }
     }
 

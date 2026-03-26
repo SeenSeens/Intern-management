@@ -53,7 +53,8 @@ class Database {
             PRIMARY KEY (id),
             KEY `project_id` (`project_id`),
             KEY `mentor_id` (`mentor_id`),
-            KEY `assigned_by` (`assigned_by`)
+            KEY `assigned_by` (`assigned_by`),
+            UNIQUE KEY unique_project_mentor (project_id, mentor_id)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_project_interns} (
@@ -67,7 +68,8 @@ class Database {
             PRIMARY KEY (id),
             KEY `project_id` (`project_id`),
             KEY `intern_id` (`intern_id`),
-            KEY `assigned_by` (`assigned_by`)
+            KEY `assigned_by` (`assigned_by`),
+            UNIQUE KEY unique_project_mentor (project_id, mentor_id)
         ) $charset_collate;";
 
         $sql[] = "CREATE TABLE {$table_tasks} (

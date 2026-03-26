@@ -1,0 +1,13 @@
+### Create Project (with mentors + interns)
+POST http://plugin.wordpress.local/wp-json/intern/v1/projects
+Content-Type: application/json
+
+{
+  "name": "Project AI System",
+  "description": "Xây dựng hệ thống AI",
+  "status": "waiting",
+  "start_date": "2026-03-25",
+  "end_date": "2026-04-10",
+  "mentors": [2, 3],
+  "interns": [5, 6, 7]
+}

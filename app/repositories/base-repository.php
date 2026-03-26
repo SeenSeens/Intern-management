@@ -21,26 +21,26 @@ class BaseRepository implements BaseRepositoryInterface{
         return $this->softDelete ? "WHERE deleted_at IS NULL" : "";
     }
     public function all(){
-        return $this->db->get_results("SELECT * FROM {$this->table} {$this->not_deleted()} ORDER BY created_at DESC");
+        return $this->select("*")
+            ->where_null("deleted_at")
+            ->order_by("created_at", "DESC")
+            ->get();
     }
 
     public function find(int $id) {
-        $where = $this->softDelete ? "AND deleted_at IS NULL" : "";
-        return $this->db->get_row($this->db->prepare("SELECT * FROM {$this->table} WHERE id = %d {$where}", $id));
+        return $this->select("*")
+            ->where_null("deleted_at")
+            ->where("id", "=", $id)
+            ->first();
     }
 
     public function create(array $data) {
-        $result = $this->db->insert($this->table, $data);
-        if (!$result) {
-            error_log('Insert failed: ' . $this->db->last_error);
-            error_log('Dữ liệu truyền vào: ' . print_r($data, true));
-            return 0; // Trả về 0 nếu lỗi thay vì ID trống
-        }
-        return (int) $this->db->insert_id;
+        return $this->insert($data);
     }
 
     public function update(int $id, array $data) {
-        return (bool) $this->db->update($this->table, $data, ['id' => $id]);
+        return $this->where('id', '=', $id)
+            ->update($data);
     }
 
     public function delete(int $id) {

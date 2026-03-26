@@ -72,7 +72,7 @@ abstract class Action {
                     'success' => true,
                     'message' => is_string($result) ? $result : 'Thực hiện thành công.',
                     'data' => $result
-                ], 500, $return);
+                ], 200, $return);
             }
 
             // Mặc định (gọi qua AJAX) vẫn dùng JSON
