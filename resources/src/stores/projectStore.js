@@ -30,6 +30,7 @@ export const useProjectStore = defineStore('project', {
       try {
         const response = await ProjectService.getById(id)
         const resData = response.data.data
+        this.mentors = resData.mentor
         this.project = {
           ...resData.project,
           mentors: resData.mentor,

@@ -16,8 +16,8 @@ class TaskRepository extends BaseRepository{
         return $this->from("{$this->table} t")
             ->select("t.*, p.name as project_name")
             ->join("$projects p","p.id = t.project_id")
-            ->whereNull("t.deleted_at")
-            ->orderBy("t.created_at",'DESC')
+            ->where_null("t.deleted_at")
+            ->order_by("t.created_at",'DESC')
             ->get();
 
     }
@@ -44,7 +44,7 @@ class TaskRepository extends BaseRepository{
                 , 0) AS progress
             ")
             ->where("project_id", "=", "$project_id")
-            ->whereNull("deleted_at")
+            ->where_null("deleted_at")
             ->first();
     }
     public function upcoming_tasks($days = 7){
@@ -52,7 +52,7 @@ class TaskRepository extends BaseRepository{
         ->where("end_date", ">=", date('Y-m-d'))
         ->where("end_date", "<=", date('Y-m-d', strtotime("+{$days} days")))
         ->where("status", "!=", "completed")
-        ->whereNull("deleted_at")
+        ->where_null("deleted_at")
         ->get();
     }
 }

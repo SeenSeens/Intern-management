@@ -1,7 +1,7 @@
 <?php
 namespace InternManagement\Core;
+if ( ! defined( 'ABSPATH' ) ) exit;
 trait QueryBuilder {
-    protected string $rawTable = '';
     protected string $where = '';
     protected string $operator = '';
     protected string $selectField = '*';
@@ -10,36 +10,14 @@ trait QueryBuilder {
     protected string $innerJoin = '';
     protected array $groupConcatFields = [];
     protected string $groupBy = '';
-
     // Mảng chứa các giá trị truyền vào để dùng với $wpdb->prepare (Bảo mật)
     protected array $bindings = [];
 
-    // Tự động thêm tiền tố database của WP (vd: wp_)
-    public function table( $table ) {
-        // nếu có alias: "tasks t"
-        if (str_contains($table, ' ')) {
-            [$name, $alias] = explode(' ', $table);
-
-            $this->rawTable = $name;
-            $this->table = $this->db->prefix . $name . ' ' . $alias;
-
-        } else {
-            $this->rawTable = $table;
-            $this->table = $this->db->prefix . $table;
-        }
-        return $this;
-    }
     public function from($table){
-        if (str_contains($table, ' ')) {
-            [$name, $alias] = explode(' ', $table);
-            $this->rawTable = $name;
-            $this->table = $this->db->prefix . $name . ' ' . $alias;
-        } else {
-            $this->rawTable = $table;
-            $this->table = $this->db->prefix . $table;
-        }
+        $this->table = $table;
         return $this;
     }
+
     public function where( $field, $compare, $value ) {
         $this->operator = empty($this->where) ? ' WHERE ' : ' AND ';
         if($value === null){
@@ -118,23 +96,18 @@ trait QueryBuilder {
     public function group_concat($field, $alias = null, $separator = ', ', $distinct = false, $orderBy = null, $condition = null) {
         $gc = "GROUP_CONCAT(";
         if ($distinct) $gc .= "DISTINCT ";
-
         if ($condition) {
             $gc .= "CASE WHEN $condition THEN $field END";
         } else {
             $gc .= $field;
         }
-
         if ($orderBy) {
             $gc .= " ORDER BY $orderBy";
         }
-
         $gc .= " SEPARATOR '$separator')";
-
         if ($alias) {
             $gc .= " AS $alias";
         }
-
         $this->groupConcatFields[] = $gc;
         return $this;
     }
@@ -150,19 +123,15 @@ trait QueryBuilder {
                 $this->selectField .= ', ' . implode(', ', $this->groupConcatFields);
             }
         }
-
         $sqlQuery = "SELECT {$this->selectField} FROM {$this->table} {$this->innerJoin} {$this->where} {$this->groupBy} {$this->orderBy} {$this->limit}";
         $sqlQuery = trim($sqlQuery);
-
         // Bảo mật với wpdb->prepare nếu có điều kiện WHERE
         if ( !empty($this->bindings) ) {
             $sqlQuery = $this->db->prepare( $sqlQuery, $this->bindings );
         }
-
         $results = $this->db->get_results( $sqlQuery );
-
         $this->rese_query();
-        return $results ?: false;
+        return $results ?: [];
     }
 
     /**
@@ -171,18 +140,14 @@ trait QueryBuilder {
     public function first() {
         // Ép lấy 1 bản ghi để tối ưu tốc độ nếu quên set limit
         $this->limit(1);
-
         $sqlQuery = "SELECT {$this->selectField} FROM {$this->table} {$this->innerJoin} {$this->where} {$this->groupBy} {$this->orderBy} {$this->limit}";
         $sqlQuery = trim($sqlQuery);
-
         if ( !empty($this->bindings) ) {
             $sqlQuery = $this->db->prepare( $sqlQuery, $this->bindings );
         }
-
         $result = $this->db->get_row( $sqlQuery );
-
         $this->rese_query();
-        return $result ?: false;
+        return $result ?: null;
     }
 
     /**
@@ -204,7 +169,7 @@ trait QueryBuilder {
     /**
      * CẬP NHẬT DỮ LIỆU (Kết hợp với hàm where)
      */
-    public function update( array $data ) {
+    public function update_query( array $data ) {
         if (empty($this->where)) return false;
         // Tạo chuỗi SET "cột = %s, cột = %s"
         $setList = [];
@@ -214,16 +179,12 @@ trait QueryBuilder {
             $updateBindings[] = $value;
         }
         $setSql = implode( ', ', $setList );
-
         $sql = "UPDATE {$this->table} SET {$setSql} {$this->where}";
-
         // Gộp biến của UPDATE và biến của WHERE lại với nhau
         $allBindings = array_merge( $updateBindings, $this->bindings );
-
         if ( !empty($allBindings) ) {
             $sql = $this->db->prepare( $sql, $allBindings );
         }
-
         $result = $this->db->query( $sql );
         $this->rese_query();
         return $result !== false;
@@ -232,18 +193,15 @@ trait QueryBuilder {
     /**
      * XÓA DỮ LIỆU (Kết hợp với hàm where)
      */
-    public function delete() {
+    public function delete_query() {
         // Chặn việc lỡ tay xóa trắng bảng nếu quên viết hàm where()
         if ( empty($this->where) ) {
             return false;
         }
-
         $sql = "DELETE FROM {$this->table} {$this->where}";
-
         if ( !empty($this->bindings) ) {
             $sql = $this->db->prepare( $sql, $this->bindings );
         }
-
         $result = $this->db->query( $sql );
         $this->rese_query();
         return $result !== false;
@@ -261,13 +219,11 @@ trait QueryBuilder {
         if ( $parentId !== null && $parentKey !== '' ) {
             $data[$parentKey] = $parentId;
         }
-
         $columns = [];
         $placeholders = [];
         $values = [];
         foreach ($data as $column => $value) {
             $columns[] = "`{$column}`";
-
             if (is_null($value)) {
                 $placeholders[] = "NULL"; // 🔥 NULL thật
             } elseif (is_int($value)) {
@@ -289,7 +245,6 @@ trait QueryBuilder {
             }
             $updateQuery = 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $updateSet );
         }
-
         $sql = sprintf(
             "INSERT INTO %s (%s) VALUES (%s) %s",
             $this->table,
@@ -297,13 +252,10 @@ trait QueryBuilder {
             implode(', ', $placeholders),
             $updateQuery
         );
-
         if (!empty($values)) {
             $sql = $this->db->prepare($sql, $values);
         }
-
         $result = $this->db->query( $sql );
-
         if ($result === false) {
             error_log("❌ SQL ERROR: " . $this->db->last_error);
             error_log("❌ SQL: " . $sql);

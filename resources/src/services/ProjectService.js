@@ -1,5 +1,4 @@
 import BaseService from "@/services/BaseService";
-import api from "../../api.js";
 
 class ProjectService extends BaseService {
 

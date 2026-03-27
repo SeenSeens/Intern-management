@@ -19,7 +19,7 @@ class ProjectController extends ApiController{
     private ProjectService $projectService;
     private ProjectMentorService $projectMentorService;
     private ProjectInternService $projectInternService;
-    private $taskService;
+    private TaskService $taskService;
     private ProjectAction $projectAction;
     public function __construct(){
         parent::__construct();
@@ -66,14 +66,14 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns/(?P<intern_id>\d+)', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_scores'],
                 'permission_callback' => [$this, 'permission']
             ],
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentors', [
+        register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/mentors', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_mentor'],
@@ -90,14 +90,14 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/mentors/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/mentors/(?P<mentor_id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_mentor'],
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns', [
+        register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_intern'],
@@ -114,7 +114,7 @@ class ProjectController extends ApiController{
                 'permission_callback' => [$this, 'permission']
             ]
         ]);
-        register_rest_route($this->namespace, '/projects/(?P<id>\d+)/interns/(?P<id>\d+)', [
+        register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns/(?P<intern_id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_intern'],
@@ -129,23 +129,17 @@ class ProjectController extends ApiController{
     // LIST (OFFSET OR CURSOR)
     public function index(WP_REST_Request $request){
         $mode = $request->get_param('mode') ?? 'offset';
-
         if ($mode === 'cursor') {
-
             $cursor = $request->get_param('cursor');
             $limit  = $request->get_param('limit') ?? 10;
-
             $result = $this->projectService->cursor_paginate(
                 $cursor ? (int)$cursor : null,
                 (int)$limit,
                 $this->filters($request)
             );
-
         } else {
-
             $page    = $request->get_param('page') ?? 1;
             $perPage = $request->get_param('per_page') ?? 10;
-
             $result = $this->projectService->offset_paginate(
                 (int)$page,
                 (int)$perPage,
@@ -155,11 +149,9 @@ class ProjectController extends ApiController{
 
         // Lấy thống kê trạng thái
         $stats = $this->projectService->count_project_status();
-
         // Gộp thống kê vào kết quả trả về
         // Giả sử $result là array, nếu là object hãy dùng $result->stats = $stats;
         $result['statistics'] = $stats;
-
         return $this->success($result);
     }
 
@@ -199,15 +191,15 @@ class ProjectController extends ApiController{
             ];
             // lấy mentors + interns từ FE
             $mentor_ids = array_map('intval', $params['mentors'] ?? []);
-            error_log(print_r($mentor_ids, true));
+            //error_log(print_r($mentor_ids, true));
             $intern_ids = array_map('intval', $params['interns'] ?? []);
-            error_log(print_r($intern_ids, true));
+            //error_log(print_r($intern_ids, true));
             $assigned_by = get_current_user_id();
             // START TRANSACTION
             $wpdb->query('START TRANSACTION');
             // tạo project
             $project_id = $this->projectService->create($data);
-            error_log("project_id". $project_id);
+            //error_log("project_id". $project_id);
             if (!$project_id) {
                 throw new Exception("Không thể tạo project");
             }
@@ -245,6 +237,7 @@ class ProjectController extends ApiController{
 
     // Update
     public function update(WP_REST_Request $request){
+        global $wpdb;
         try {
             $id = (int) $request['id'];
             $params = $request->get_json_params() ?? $request->get_params();
@@ -263,16 +256,50 @@ class ProjectController extends ApiController{
                 'start_date' => $start_date,
                 'end_date' => $end_date,
             ];
+            // lấy mentors + interns từ FE
+            $mentor_ids = array_map('intval', $params['mentors']);
+            //error_log(print_r($mentor_ids, true));
+            $intern_ids = array_map('intval', $params['interns']);
+            //error_log(print_r($intern_ids, true));
+            $assigned_by = get_current_user_id();
+            // START TRANSACTION
+            $wpdb->query('START TRANSACTION');
             $updated = $this->projectService->update(
                 $id,
                 $data
             );
+            error_log("project". $updated);
+            if (!$updated) {
+                throw new Exception("Không thể cập nhật project");
+            }
+            // sync mentors
+            if (!empty($mentor_ids)) {
+                $this->projectMentorService->sync_project_mentors(
+                    $id,
+                    $mentor_ids,
+                    $assigned_by
+                );
+            }
+            // sync interns
+            if (!empty($intern_ids)) {
+                $this->projectInternService->sync_project_interns(
+                    $id,
+                    $intern_ids,
+                    $assigned_by
+                );
+            }
+            // COMMIT
+            $wpdb->query('COMMIT');
             return $this->success([
                 'updated' => $updated
             ]);
 
         } catch (Exception $e) {
-
+            error_log('❌ ERROR: ' . $e->getMessage());
+            error_log('❌ SQL: ' . $wpdb->last_query);
+            error_log('❌ DB ERROR: ' . $wpdb->last_error);
+            // ROLLBACK nếu lỗi
+            $wpdb->query('ROLLBACK');
             return $this->error($e->getMessage(), 422);
         }
     }

@@ -14,12 +14,9 @@ class BaseRepository implements BaseRepositoryInterface{
     public function __construct( string $table ){
         global $wpdb;
         $this->db = $wpdb;
-        $this->rawTable = $table; // Lưu lại tên gốc nếu Trait QueryBuilder cần dùng
         $this->table = $wpdb->prefix . $table;
     }
-    protected function not_deleted(): string{
-        return $this->softDelete ? "WHERE deleted_at IS NULL" : "";
-    }
+
     public function all(){
         return $this->select("*")
             ->where_null("deleted_at")
@@ -40,7 +37,7 @@ class BaseRepository implements BaseRepositoryInterface{
 
     public function update(int $id, array $data) {
         return $this->where('id', '=', $id)
-            ->update($data);
+            ->update_query($data);
     }
 
     public function delete(int $id) {
@@ -60,23 +57,18 @@ class BaseRepository implements BaseRepositoryInterface{
         $offset  = ($page - 1) * $perPage;
         $where  = [];
         $params = [];
-
         if ($this->softDelete) {
             $where[] = "deleted_at IS NULL";
         }
-
         foreach ($filters as $column => $value) {
             if ($value === null || $value === '') continue;
-
             $where[] = "{$column} = %s";
             $params[] = $value;
         }
-
         $whereSql = count($where) ? "WHERE " . implode(" AND ", $where) : "";
         // Count total
         $countSql = "SELECT COUNT(*) FROM {$this->table} {$whereSql}";
         $total = empty( $params ) ? (int) $this->db->get_var($countSql) : (int) $this->db->get_var( $this->db->prepare($countSql, ...$params) );
-
         // Get data
         $dataSql = "
             SELECT *
@@ -85,9 +77,7 @@ class BaseRepository implements BaseRepositoryInterface{
             ORDER BY {$orderBy} {$direction}
             LIMIT %d OFFSET %d
         ";
-
         $queryParams = array_merge($params, [$perPage, $offset]);
-
         $items = empty($params)
             ? $this->db->get_results(
                 $this->db->prepare(
@@ -105,7 +95,6 @@ class BaseRepository implements BaseRepositoryInterface{
             : $this->db->get_results(
             $this->db->prepare($dataSql, ...$queryParams)
         );
-
         return [
             'items' => $items,
             'meta' => [
@@ -119,30 +108,23 @@ class BaseRepository implements BaseRepositoryInterface{
 
     public function cursor_paginate(?int $cursor = null, int $limit = 10, array $filters = [], string $cursorColumn = 'id'){
         $limit = max(1, $limit);
-
         $where = [];
         $params = [];
-
         if ($this->softDelete) {
             $where[] = "deleted_at IS NULL";
         }
-
         foreach ($filters as $column => $value) {
             if ($value === null || $value === '') continue;
-
             $where[] = "{$column} = %s";
             $params[] = $value;
         }
-
         if ($cursor) {
             $where[] = "{$cursorColumn} < %d";
             $params[] = $cursor;
         }
-
         $whereSql = count($where)
             ? "WHERE " . implode(" AND ", $where)
             : "";
-
         $sql = "
             SELECT *
             FROM {$this->table}
@@ -150,17 +132,13 @@ class BaseRepository implements BaseRepositoryInterface{
             ORDER BY {$cursorColumn} DESC
             LIMIT %d
         ";
-
         $params[] = $limit;
-
         $items = $this->db->get_results(
             $this->db->prepare($sql, ...$params),
         );
-
         $nextCursor = count($items) === $limit
             ? end($items)->$cursorColumn
             : null;
-
         return [
             'data' => $items,
             'next_cursor' => $nextCursor,
@@ -172,7 +150,6 @@ class BaseRepository implements BaseRepositoryInterface{
         $where = $this->softDelete
             ? "WHERE deleted_at IS NULL"
             : "";
-
         $sql = "
             SELECT
                 COUNT(*) as total,
@@ -181,16 +158,12 @@ class BaseRepository implements BaseRepositoryInterface{
             {$where}
             GROUP BY {$statusColumn}
         ";
-
         $rows = $this->db->get_results($sql, ARRAY_A);
-
         $result = ['total' => 0];
-
         foreach ($rows as $row) {
             $result['total'] += (int) $row['total'];
             $result[$row[$statusColumn]] = (int) $row['total'];
         }
-
         return $result;
     }
 }
