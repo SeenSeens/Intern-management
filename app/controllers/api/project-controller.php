@@ -34,12 +34,16 @@ class ProjectController extends ApiController{
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'index'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'store'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/(?P<id>\d+)', [
@@ -122,9 +126,6 @@ class ProjectController extends ApiController{
             ]
         ]);
     }
-    public function permission(): bool{
-        return $this->require_login();
-    }
 
     // LIST (OFFSET OR CURSOR)
     public function index(WP_REST_Request $request){
@@ -163,6 +164,7 @@ class ProjectController extends ApiController{
             $data['mentor'] = $this->projectMentorService->get_mentor_project($id);
             $data['intern'] = $this->projectInternService->get_intern_project($id);
             $data['overall'] = $this->taskService->overall_progress($id);
+            $data['task_project'] = $this->taskService->get_tasks_from_project($id);
             return $this->success($data);
         } catch (Exception $e) {
             return $this->error($e->getMessage());

@@ -1,5 +1,12 @@
 <script setup>
+import {onMounted} from "vue";
+import {useProfileStore} from "@/stores/profileStore.js";
 
+const profileStore = useProfileStore()
+
+onMounted(() => {
+  profileStore.loadProfile()
+})
 </script>
 
 <template>
@@ -36,7 +43,7 @@
             <label class="block text-sm font-semibold text-on-surface">Họ và tên</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">person</span>
-              <input class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="text" value="Alex Mitchell"/>
+              <input v-model="profileStore.profile.name" class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="text" value="Alex Mitchell"/>
             </div>
           </div>
           <!-- Email Input -->

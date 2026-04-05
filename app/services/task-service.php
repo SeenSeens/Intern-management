@@ -19,4 +19,7 @@ class TaskService extends BaseService {
     public function upcoming_tasks($days){
         return $this->repository->upcoming_tasks($days);
     }
+    public function get_tasks_from_project($project_id){
+        return $this->repository->get_tasks_from_project($project_id);
+    }
 }

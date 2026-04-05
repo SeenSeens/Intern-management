@@ -13,7 +13,7 @@ const project = ref(null)
 onMounted(async () => {
   const id = route.params.id
   const p = await projectStore.find(id)
-  console.log("project API:", p)
+  //console.log("project API:", p)
   if (p) project.value = { ...p }
 })
 
@@ -29,6 +29,7 @@ watch(
 
 const submit = async (data) => {
   try {
+    console.log(project.value.id)
     await projectStore.updateProject(project.value.id, data)
     router.push('/project')
   } catch (e) {

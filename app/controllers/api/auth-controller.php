@@ -1,21 +1,43 @@
 <?php
 namespace InternManagement\App\Controllers\Api;
+use Exception;
 use InternManagement\Core\ApiController;
+use InternManagement\Core\Helper;
+use WP_Error;
 use WP_REST_Request;
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class AuthController extends ApiController{
-
     protected function register_routes(): void{
         register_rest_route($this->namespace, '/login', [
-            'methods'  => 'POST',
-            'callback' => [ $this, 'intern_login' ],
-            'permission_callback' => '__return_true'
+            'methods' => 'POST',
+            'callback' => [$this, 'intern_login'],
+            'permission_callback' => '__return_true',
+            'args' => []
+        ]);
+        register_rest_route($this->namespace, '/me', [
+            'methods' => 'GET',
+            'callback' => function(WP_REST_Request $request){
+                $user = wp_get_current_user();
+                return [
+                    'id' => $user->ID,
+                    'name' => $user->display_name,
+                    'email' => $user->user_email,
+                    'roles' => $user->roles
+                ];
+            },
+            'permission_callback' => function($request){
+                return $this->check_permission($request, []);
+            }
+        ]);
+        register_rest_route($this->namespace, '/refresh-token', [
+            'methods' => 'POST',
+            'callback' => [$this, 'refresh_token_api_callback'],
+            'permission_callback' => '__return_true',
         ]);
     }
-
-    function intern_login(WP_REST_Request $request){
-        $params = $request->get_json_params() ?? $request->get_params();
-        if ( empty($params['username']) || empty($params['password']) ) {
+    public function intern_login(WP_REST_Request $request){
+        $params = $request->get_params();
+        if (empty($params['username']) || empty($params['password'])) {
             return $this->error('Username hoặc password không được để trống');
         }
         $creds = [
@@ -24,17 +46,58 @@ class AuthController extends ApiController{
             'remember' => true
         ];
         $user = wp_signon($creds, false);
-        if( is_wp_error($user) ){
-            return $this->error( $user->get_error_message() );
+        if (is_wp_error($user)) {
+            return $this->error($user->get_error_message(), 401);
         }
-        wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID, true);
-        do_action('wp_login', $user->user_login, $user);
+        // 🔥 CHECK ROLE
+        $allowed_roles = ALLOWED_ROLES;
+        $user_roles = (array) $user->roles;
+        $has_valid_role = array_intersect($allowed_roles, $user_roles);
+        if (empty($has_valid_role)) {
+            return $this->error('Bạn không có quyền đăng nhập hệ thống này', 403);
+        }
+        // JWT
+        $tokens = Helper::generate_tokens($user);
         return $this->success([
-            'id' => $user->ID,
-            'name' => $user->display_name,
-            'email' => $user->user_email,
-            'roles' => $user->roles
+            'access_token'  => $tokens['access_token'],
+            'refresh_token' => $tokens['refresh_token'],
+            'user' => [
+                'id' => $user->ID,
+                'name' => $user->display_name,
+                'email' => $user->user_email,
+                'roles' => $user->roles
+            ]
         ]);
+    }
+    public static function refresh_token_api_callback( WP_REST_Request $request ) {
+        $refresh_token = $request->get_param( 'refresh_token' );
+        if ( ! $refresh_token ) {
+            return new WP_Error( 'no_token', 'Thiếu refresh token.', [ 'status' => 400 ] );
+        }
+        try {
+            // Decode token. Nếu hết hạn, nó sẽ văng thẳng xuống block catch
+            $decoded = Helper::jwt_decode($refresh_token);
+            // 1. Kiểm tra xem token gửi lên có đúng là 'refresh' không
+            if ( $decoded->type !== 'refresh' ) {
+                throw new Exception('Token không hợp lệ');
+            }
+            $user_id = $decoded->data->id;
+            // 2. (Tùy chọn) So sánh với token đang lưu trong DB
+            $saved_token = get_user_meta( $user_id, 'jwt_refresh_token', true );
+            if ( $refresh_token !== $saved_token ) {
+                throw new Exception('Token đã bị thu hồi');
+            }
+            // 3. Hợp lệ -> Lấy user và tạo cặp token mới (Token Rotation)
+            $user = get_user_by('id', $user_id);
+            $new_tokens = Helper::generate_tokens($user);
+            return rest_ensure_response([
+                'access_token'  => $new_tokens['access_token'],
+                'refresh_token' => $new_tokens['refresh_token']
+            ]);
+
+        } catch ( Exception $e ) {
+            // Token sai, hoặc đã hết hạn (exp)
+            return new WP_Error( 'jwt_invalid', $e->getMessage(), ['status' => 401] );
+        }
     }
 }

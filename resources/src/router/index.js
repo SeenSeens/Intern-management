@@ -29,7 +29,7 @@ const router = createRouter({
     {
       path: '/',
       component: App,
-      meta: { requiresAuth: false },
+      meta: { requiresAuth: true },
       children: [
         {
           name: 'dashboard',
@@ -76,20 +76,18 @@ const router = createRouter({
   ],
 })
 
-/*router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
-  if (!auth.user) {
+  if (!auth.checked) {
+    // 👇 delay nhẹ để cookie ổn định
+    await new Promise(resolve => setTimeout(resolve, 50))
     await auth.fetchUser()
   }
-  if ( to.meta.requiresAuth && !auth.user ) {
+  if (to.meta.requiresAuth && !auth.user) {
     next('/login')
-  }
-  else if (to.path === '/login' && auth.user) {
-    next('/')
-  }
-  else {
+  } else {
     next()
   }
-})*/
+})
 
 export default router

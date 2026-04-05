@@ -1,25 +1,22 @@
-import api from "../../api.js";
-import axios from "axios";
+import api from "@/utils/api.js"
+import axios from "axios"
 export default new class AuthService {
   async login(username, password){
-    try {
-      await api.post(`/intern/v1/login`, { username, password })
-    } catch (e){
-      const form = new FormData()
-      form.append('log', username)
-      form.append('pwd', password)
-      form.append('rememberme', 'forever')
-
-      await axios.post(`/wp-login.php`, form, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+    const res = await api.post(`/intern/v1/login`, { username, password })
+    if (!res.data.success) {
+      throw new Error(res.data.error || 'Login failed')
     }
-    return this.me()
+    const { access_token, refresh_token, user } = res.data.data
+    localStorage.setItem('token', access_token)
+    if (access_token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+    }
+    return { user, access_token, refresh_token }
   }
-  async me(){
-    return await api.get('/wp/v2/users/me')
+  async meJWT(){
+    return await api.get(`/intern/v1/me`)
+  }
+  async meWP(){
+    return await api.get(`/wp/v2/users/me`)
   }
 }

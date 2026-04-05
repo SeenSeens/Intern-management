@@ -16,28 +16,27 @@
  * Requires Plugins:
  */
 
-
 use InternManagement\Core\Database;
+use InternManagement\Core\Role;
 use InternManagement\Plugin;
-
 if ( ! defined( 'ABSPATH' ) ) exit;
-
-function intern(): void {
-    define( 'INTERN_MANAGEMENT_MAIN_FILE', __FILE__ );
-    define( 'INTERN_MANAGEMENT_URL', plugin_dir_url( __FILE__ ) );
-    define( 'INTERN_MANAGEMENT_PATH', plugin_dir_path( __FILE__ ) );
-    define( 'INTERN_MANAGEMENT_PREFIX', 'tbay_intern_');
-
-    // Autoload Composer files
-    if ( file_exists( INTERN_MANAGEMENT_PATH . 'vendor/autoload.php' ) ) {
-        require_once INTERN_MANAGEMENT_PATH . 'vendor/autoload.php';
-        //error_log('Autoload loaded successfully');
-    } else {
-        //error_log('Autoload file not found');
-    }
-
-    Plugin::instance();
-
+define( 'INTERN_MANAGEMENT_MAIN_FILE', __FILE__ );
+define( 'INTERN_MANAGEMENT_URL', plugin_dir_url( __FILE__ ) );
+define( 'INTERN_MANAGEMENT_PATH', plugin_dir_path( __FILE__ ) );
+define( 'INTERN_MANAGEMENT_PREFIX', 'tbay_intern_');
+const ALLOWED_ROLES = [ 'administrator', 'project_manager', 'mentor', 'intern' ];
+const JWT_AUTH_SECRET_KEY = '4OWcPAYANYMYb/=fj/6d7947*(Bt7I1G)gx7xKFNkC<qG}=G|boZ}V;%A/$igI<.';
+const JWT_AUTH_CORS_ENABLE = true;
+// Autoload Composer files
+if ( file_exists( INTERN_MANAGEMENT_PATH . 'vendor/autoload.php' ) ) {
+    require_once INTERN_MANAGEMENT_PATH . 'vendor/autoload.php';
 }
-add_action( 'plugins_loaded', 'intern' );
-
+register_activation_hook( INTERN_MANAGEMENT_MAIN_FILE, [Database::class, 'activate'] );
+register_deactivation_hook(INTERN_MANAGEMENT_MAIN_FILE, [Database::class, 'drop_table'] );
+register_deactivation_hook(INTERN_MANAGEMENT_MAIN_FILE, [Role::class, 'remove_custom_roles'] );
+function intern_run(): void{
+    if (class_exists(Plugin::class)) {
+        Plugin::instance();
+    }
+}
+add_action( 'plugins_loaded', 'intern_run' );

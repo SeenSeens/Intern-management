@@ -1,5 +1,5 @@
-import BaseService from "@/services/BaseService.js";
-import api from "../../api.js";
+import BaseService from "@/services/BaseService.js"
+import api from "@/utils/api.js"
 
 export default new class UserService extends BaseService {
   constructor() {

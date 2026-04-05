@@ -1,8 +1,10 @@
 <script setup>
 import {onMounted, ref} from "vue";
+import {useAuthStore} from "@/stores/authStore.js";
 const emit = defineEmits(["toggleSidebar"]);
 
 const darkMode = ref(false);
+const auth = useAuthStore()
 
 const toggleDark = () => {
   darkMode.value = !darkMode.value;
@@ -24,6 +26,9 @@ onMounted(() => {
     document.documentElement.classList.add("dark");
   }
 });
+const logout = () => {
+  auth.logout()
+}
 </script>
 
 <template>
@@ -63,12 +68,12 @@ onMounted(() => {
           <span class="material-symbols-outlined text-lg opacity-70">person</span>
           Hồ sơ
         </a>
-        <RouterLink to="/setting" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors" href="#">
+        <RouterLink to="/setting" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
           <span class="material-symbols-outlined text-lg opacity-70">settings</span>
           Cài đặt
         </RouterLink>
         <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
-        <a class="flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors" href="#">
+        <a @click="logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
           <span class="material-symbols-outlined text-lg">logout</span>
           Đăng xuất
         </a>

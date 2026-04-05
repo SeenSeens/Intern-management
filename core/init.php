@@ -7,7 +7,7 @@ class Init {
     private array $custom_templates = [
         'templates/app.php' => 'Intern management',
     ];
-    private function __construct(){
+    public function __construct(){
         $this->load_dependencies();
         $this->register_hooks();
     }
@@ -20,47 +20,27 @@ class Init {
     private function load_dependencies(): void{
         // Khởi tạo các thành phần cốt lõi
         Role::instance();
-        register_activation_hook(INTERN_MANAGEMENT_MAIN_FILE, [Database::class, 'activate'] );
-        new Menu();
         // Load Routes
         $this->load_routes();
 
     }
     private function load_routes(): void{
-        require_once INTERN_MANAGEMENT_PATH . '/app/routes/web/admin-post.php';
         require_once INTERN_MANAGEMENT_PATH . '/app/routes/api/api.php';
-        require_once INTERN_MANAGEMENT_PATH . '/app/routes/shortcode/index.php';
     }
-
     private function register_hooks(): void {
-
-
-        // Add template vào dropdown Page Template
         add_filter('theme_page_templates', [$this, 'register_custom_templates']);
-        // Load template từ plugin
         add_filter('template_include', [$this, 'load_custom_template']);
-
         add_action('init', [ $this, 'rewrite_rule' ]);
-
         add_filter('query_vars', [ $this, 'add_query_vars' ]);
-
         add_action('template_redirect', [ $this, 'redirect_to_template' ]);
-
-        // Cho phép CORS từ Vite
-        add_action('send_headers', [ $this, 'cors_credentials' ]);
-
-        // Ép WordPress nhận diện User từ Cookie khi gọi từ Localhost
         add_filter('determine_current_user', [ $this, 'identify_user' ], 20 );
-
         add_action('rest_api_init', [$this, 'enable_cors']);
-
     }
     // Thêm template vào dropdown trong Page Attributes
     public function register_custom_templates(array $templates): array{
         // Hợp nhất template của theme và template của plugin
         return array_merge($templates, $this->custom_templates);
     }
-
     // Load file template từ plugin thay vì theme
     public function load_custom_template($template) {
         if (is_page()) {
@@ -69,7 +49,7 @@ class Init {
             // Kiểm tra: Nếu slug này nằm trong danh sách template của plugin mình
             if (isset($this->custom_templates[$chosen_template_slug])) {
                 // Tạo đường dẫn tuyệt đối đến file template trong plugin
-                $plugin_template_path = plugin_dir_path(INTERN_MANAGEMENT_MAIN_FILE) . $chosen_template_slug;
+                $plugin_template_path = INTERN_MANAGEMENT_PATH . $chosen_template_slug;
                 // Nếu file tồn tại thì trả về file đó, ngắt luồng của WP
                 if (file_exists($plugin_template_path)) {
                     return $plugin_template_path;
@@ -79,7 +59,6 @@ class Init {
         // Nếu không phải template của mình, trả về template mặc định của WP
         return $template;
     }
-
     function rewrite_rule() {
         add_rewrite_rule(
             '^intern-api-docs/?$',
@@ -87,66 +66,34 @@ class Init {
             'top'
         );
     }
-
     function add_query_vars ($vars) {
         $vars[] = 'intern_api_docs';
         return $vars;
     }
-
     function redirect_to_template(): void{
         if (get_query_var('intern_api_docs')) {
             require_once INTERN_MANAGEMENT_PATH . '/templates/api-docs.php';
             exit;
         }
     }
-
-    function cors_credentials(): void{
-        // Cho phép chính xác port của Vite
-        header("Access-Control-Allow-Origin: http://plugin.wordpress.local:5173");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-        header("Access-Control-Allow-Headers: X-WP-Nonce, Content-Type, Authorization");
-
-        // BẮT BUỘC: Cho phép gửi Cookie/Session
-        header("Access-Control-Allow-Credentials: true");
-
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-            status_header(200);
-            exit;
-        }
-    }
-
     function identify_user($user_id) {
         if ($user_id <= 0 && isset($_COOKIE[LOGGED_IN_COOKIE])) {
             // Giải mã cookie để tìm User ID nếu WordPress chưa kịp nhận diện
-            $cookie_elements = wp_parse_auth_cookie('', 'logged_in');
-            if ($cookie_elements) {
-                $user = get_user_by('login', $cookie_elements['username']);
-                if ($user) {
-                    return $user->ID;
-                }
+            $valid_user_id = wp_validate_auth_cookie('', 'logged_in');
+            if ($valid_user_id) {
+                return $valid_user_id;
             }
         }
         return $user_id;
     }
-
-    public function enable_cors() {
-
+    public function enable_cors(): void{
         remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
-
         add_filter('rest_pre_serve_request', function ($value) {
-
-            header('Access-Control-Allow-Origin: http://plugin.wordpress.local:5173');
+            header('Access-Control-Allow-Origin: http://wordpress.local:5173');
             header('Access-Control-Allow-Credentials: true');
             header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce');
             header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-
             return $value;
-
         });
-
     }
 }
-
-
-
-

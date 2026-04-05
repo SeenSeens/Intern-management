@@ -4,43 +4,38 @@ import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
-
 const auth = useAuthStore()
 const router = useRouter()
-
 const loading = ref(false)
 const error = ref(null)
 const showPassword = ref(false)
-
+const remember = ref(false)
 // schema validate
 const schema = yup.object({
   username: yup.string().required('Vui lòng nhập tên người dùng'),
   password: yup.string().required('Vui lòng nhập mật khẩu')
 })
-
 // tạo form
 const { handleSubmit } = useForm({
   validationSchema: schema
 })
-
 // tạo field
 const { value: username, errorMessage: userError } = useField('username')
 const { value: password, errorMessage: passwordError } = useField('password')
-
 const submit = handleSubmit ( async (values) => {
   loading.value = true
   error.value = null
   try {
-    const user = await auth.login(values.username, values.password)
-    if (user){
+    await auth.login(values.username, values.password)
+    if (auth.user){
       router.push('/')
     }
   } catch (e) {
-    error.value = e.response?.data?.message || 'Sai tài khoản hoặc mật khẩu'
+    //error.value = e.message
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 })
-
 onMounted(async () => {
   await auth.fetchUser()
     if (auth.user) {
@@ -65,14 +60,14 @@ onMounted(async () => {
         <form class="space-y-6" @submit.prevent="submit">
           <!-- Email Field -->
           <div class="space-y-2">
-            <label class="text-sm font-semibold text-slate-700" for="email">
+            <label class="text-sm font-semibold text-slate-700" for="username">
               Email Address
             </label>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
                 <span class="material-symbols-outlined text-xl">mail</span>
               </div>
-              <input class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" type="text" v-model="username"/>
+              <input class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" type="text" id="username" v-model="username"/>
               <span class="text-red-500 text-sm">{{ userError }}</span>
             </div>
           </div>
@@ -90,7 +85,7 @@ onMounted(async () => {
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
                 <span class="material-symbols-outlined text-xl">lock</span>
               </div>
-              <input class="block w-full pl-10 pr-10 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" :type="showPassword ? 'text' : 'password'" v-model="password"/>
+              <input class="block w-full pl-10 pr-10 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" :type="showPassword ? 'text' : 'password'" id="password" v-model="password"/>
               <span class="text-red-500 text-sm">{{ passwordError }}</span>
               <button @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600" type="button">
                 <span class="material-symbols-outlined text-xl">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>

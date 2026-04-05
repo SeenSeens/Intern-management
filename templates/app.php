@@ -1,3 +1,9 @@
+<?php
+/**
+ * Template Name: Intern management (Fullscreen)
+ */
+if ( ! defined( 'ABSPATH' ) ) exit;
+?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>

@@ -4,12 +4,12 @@ export const useProjectStore = defineStore('project', {
   state: () => ({
     projects: [],
     project: null,
-    mentors: [],
-    interns: [],
+    //mentors: [],
+    //interns: [],
     loading: false,
     meta: [],
     statistics: [],
-    overall: null
+    //overall: []
   }),
   actions: {
     async fetchProjects(page = 1) {
@@ -30,13 +30,13 @@ export const useProjectStore = defineStore('project', {
       try {
         const response = await ProjectService.getById(id)
         const resData = response.data.data
-        this.mentors = resData.mentor
         this.project = {
           ...resData.project,
           mentors: resData.mentor,
-          interns: resData.intern
+          interns: resData.intern,
+          overall: resData.overall,
+          tasksProject: resData.task_project
         }
-        this.overall = resData.overall || null
         return this.project
       } catch (e) {
         console.error("find project error:", e)
@@ -57,7 +57,7 @@ export const useProjectStore = defineStore('project', {
 
     async updateProject(id, data) {
       const res = await ProjectService.update(id, data)
-      const index = this.projects.getById(p => p.id === id)
+      const index = this.projects.findIndex(p => p.id === id)
       if (index !== -1) {
         this.projects[index] = res.data
       }

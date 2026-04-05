@@ -3,6 +3,8 @@ import {useProjectStore} from "@/stores/projectStore.js";
 import {onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 
+const viewMode = ref('board') // 'board' | 'list'
+
 const route = useRoute()
 const projectStore = useProjectStore()
 const loadData = async (id) => {
@@ -58,8 +60,8 @@ watch(
                 <span class="material-symbols-outlined text-4xl">rocket_launch</span>
               </div>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">{{ projectStore.project.name }}</h3>
-            <p class="text-slate-600 leading-relaxed text-sm">{{ projectStore.project.description }}</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">{{ projectStore.project?.name }}</h3>
+            <p class="text-slate-600 leading-relaxed text-sm">{{ projectStore.project?.description }}</p>
           </div>
         </div>
         <!-- Task Progress Section -->
@@ -67,12 +69,32 @@ watch(
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-900">Tiến độ công việc</h3>
             <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button class="px-3 py-1 bg-white shadow text-xs font-medium rounded text-slate-900">Board</button>
-              <button class="px-3 py-1 text-xs font-medium rounded text-slate-500 hover:text-slate-900">List</button>
+              <button
+                @click="viewMode = 'board'"
+                :class="[
+                  'px-3 py-1 text-xs font-medium rounded',
+                  viewMode === 'board'
+                    ? 'bg-white shadow text-slate-900'
+                    : 'text-slate-500 hover:text-slate-900'
+                ]"
+              >
+                Board
+              </button>
+              <button
+                @click="viewMode = 'list'"
+                :class="[
+                  'px-3 py-1 text-xs font-medium rounded',
+                  viewMode === 'list'
+                    ? 'bg-white shadow text-slate-900'
+                    : 'text-slate-500 hover:text-slate-900'
+                ]"
+              >
+                List
+              </button>
             </div>
           </div>
           <!-- Kanban Board -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div v-if="viewMode === 'board'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Column: To Do -->
             <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between mb-1">
@@ -165,6 +187,65 @@ watch(
               </div>
             </div>
           </div>
+          <!-- Task Table -->
+          <div v-else class="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-outline bg-surface-container-low/50">
+                    <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Tên nhiệm vụ</th>
+                    <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-center">Trạng thái</th>
+                    <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Độ ưu tiên</th>
+                    <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Hạn chót</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline">
+                  <tr class="transition-colors group" v-for="(task, index) in projectStore.project?.tasksProject">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 rounded border border-outline flex-shrink-0 cursor-pointer"></div>
+                        <div>
+                          <p class="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors cursor-pointer">{{ task.title }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary-container text-on-primary-container">{{ task.status }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-error" data-icon="keyboard_double_arrow_up" data-weight="fill" style="font-variation-settings: 'FILL' 1;">keyboard_double_arrow_up</span>
+                        <span class="text-sm font-medium text-on-surface">{{ task.priority }}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex flex-col">
+                        <span class="text-sm font-medium text-on-surface">{{ task.end_date }}</span>
+                        <span class="text-[11px] text-error font-semibold">2 days left</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t border-outline flex items-center justify-between bg-surface-container-low/30">
+              <p class="text-xs text-on-surface-variant font-medium">Showing <span class="text-on-surface font-bold">5</span> of <span class="text-on-surface font-bold">24</span> tasks</p>
+              <div class="flex items-center gap-1">
+                <button class="p-1 text-on-surface-variant hover:bg-white border border-transparent hover:border-outline rounded transition-all">
+                  <span class="material-symbols-outlined text-lg" data-icon="chevron_left">chevron_left</span>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded bg-primary text-white">1</button>
+                <button class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded text-on-surface-variant hover:bg-white transition-all">2</button>
+                <button class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded text-on-surface-variant hover:bg-white transition-all">3</button>
+                <span class="px-1 text-on-surface-variant">...</span>
+                <button class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded text-on-surface-variant hover:bg-white transition-all">5</button>
+                <button class="p-1 text-on-surface-variant hover:bg-white border border-transparent hover:border-outline rounded transition-all">
+                  <span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <!-- Right Sidebar -->
@@ -179,25 +260,25 @@ watch(
                 <circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="100" stroke-dashoffset="35" stroke-linecap="round" stroke-width="3"></circle>
               </svg>
               <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <span class="text-3xl font-bold text-slate-900">{{ projectStore.overall.progress }}%</span>
+                <span class="text-3xl font-bold text-slate-900">{{ projectStore.project?.overall?.progress }}%</span>
                 <span class="block text-xs text-slate-500 font-medium uppercase tracking-wide">Hoàn thành</span>
               </div>
             </div>
             <div class="flex w-full justify-between mt-6 px-2 text-center">
               <div>
-                <p class="text-2xl font-bold text-slate-900">{{ projectStore.overall.total }}</p>
+                <p class="text-2xl font-bold text-slate-900">{{ projectStore.project?.overall?.total }}</p>
                 <p class="text-xs text-slate-500">Tổng số nhiệm vụ</p>
               </div>
               <div>
-                <p class="text-2xl font-bold text-slate-900">{{ projectStore.overall.in_progress }}</p>
+                <p class="text-2xl font-bold text-slate-900">{{ projectStore.project?.overall?.in_progress }}</p>
                 <p class="text-xs text-slate-500">Đang tiến hành</p>
               </div>
               <div>
-                <p class="text-2xl font-bold text-green-600">{{ projectStore.overall.completed }}</p>
+                <p class="text-2xl font-bold text-green-600">{{ projectStore.project?.overall?.completed }}</p>
                 <p class="text-xs text-slate-500">Hoàn thành</p>
               </div>
               <div>
-                <p class="text-2xl font-bold text-orange-500">{{ projectStore.overall.pending }}</p>
+                <p class="text-2xl font-bold text-orange-500">{{ projectStore.project?.overall?.pending }}</p>
                 <p class="text-xs text-slate-500">Chưa giải quyết</p>
               </div>
             </div>
@@ -241,33 +322,31 @@ watch(
         </div>
         <!-- Team Members Card -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <h3 class="text-base font-bold text-slate-900 mb-4">Team Members</h3>
+          <h3 class="text-base font-bold text-slate-900 mb-4">Thành viên nhóm</h3>
           <!-- Mentors -->
           <div class="mb-5">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Mentors</p>
-            <div class="flex items-center gap-3 mb-3" v-for="(mentor, index) in projectStore.mentors" :key="index">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Người cố vấn</p>
+            <div class="flex items-center gap-3 mb-3" v-for="(mentor, index) in projectStore.project?.mentors" :key="mentor.id">
               <img alt="Mentor avatar" class="h-8 w-8 rounded-full object-cover ring-2 ring-white" data-alt="Male mentor face" :src="mentor.avatar"/>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-slate-900 truncate">{{ mentor.display_name }}</p>
-                <p class="text-xs text-slate-500 truncate">Senior Developer</p>
               </div>
               <button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">mail</span></button>
             </div>
           </div>
           <!-- Interns -->
           <div>
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Interns</p>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Thực tập sinh</p>
             <div class="space-y-3">
-              <div class="flex items-center gap-3" v-for="(intern, index) in projectStore.interns" :key="index">
+              <div class="flex items-center gap-3" v-for="(intern, index) in projectStore.project?.interns" :key="intern.id">
                 <img alt="Intern avatar" class="h-8 w-8 rounded-full object-cover ring-2 ring-white" data-alt="Female intern face" :src="intern.avatar"/>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-slate-900 truncate">{{ intern.display_name }}</p>
-                  <p class="text-xs text-slate-500 truncate">Frontend Intern</p>
                 </div>
               </div>
             </div>
-            <button class="mt-4 w-full py-2 text-sm text-primary font-medium hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-primary/30">24
-              + Add Member
+            <button class="mt-4 w-full py-2 text-sm text-primary font-medium hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-primary/30">
+              + Thêm thành viên
             </button>
           </div>
         </div>

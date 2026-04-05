@@ -1,6 +1,0 @@
-- 1 lỗi kiến trúc khá lớn trong bảng task_details
-- cách tối ưu DB cho hệ thống task
-- cách query nhanh hơn 5–10 lần
-- Database ERD chuẩn production (đẹp như tài liệu system design)
-- Flow hoạt động của hệ thống (Manager → Mentor → Intern → Task)
-- API Architecture diagram (Vue → WP REST API → Database)

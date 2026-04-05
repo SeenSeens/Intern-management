@@ -1,16 +1,17 @@
 <?php
 namespace InternManagement\App\Repositories;
-
-
 use DateTime;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class TaskRepository extends BaseRepository{
     protected string $table = 'intern_tasks';
-
     public function __construct() {
         parent::__construct( $this->table );
     }
-    // Lấy tất cả các tasks
+
+    /**
+     * Lấy tất cả các tasks
+     * @return array|object|\stdClass[]
+     */
     public function get_all_tasks(){
         $projects = $this->db->prefix . 'intern_projects';
         return $this->from("{$this->table} t")
@@ -19,8 +20,11 @@ class TaskRepository extends BaseRepository{
             ->where_null("t.deleted_at")
             ->order_by("t.created_at",'DESC')
             ->get();
-
     }
+
+    /**
+     * @return array|object|\stdClass|null
+     */
     public function statistics(){
         return $this->select(
             "COUNT(CASE WHEN STATUS = 'pending' THEN 1 END) AS pending,
@@ -29,6 +33,11 @@ class TaskRepository extends BaseRepository{
             COUNT(*) AS total")
             ->first();
     }
+
+    /**
+     * @param int $project_id
+     * @return array|object|\stdClass|null
+     */
     public function overall_progress(int $project_id){
         return $this->from("{$this->table} t")
             ->select("
@@ -47,6 +56,11 @@ class TaskRepository extends BaseRepository{
             ->where_null("deleted_at")
             ->first();
     }
+
+    /**
+     * @param $days
+     * @return array|object|\stdClass[]
+     */
     public function upcoming_tasks($days = 7){
         return $this->select("*")
         ->where("end_date", ">=", date('Y-m-d'))
@@ -54,5 +68,12 @@ class TaskRepository extends BaseRepository{
         ->where("status", "!=", "completed")
         ->where_null("deleted_at")
         ->get();
+    }
+    // Lấy task trong project
+    public function get_tasks_from_project($project_id){
+        return $this->select("*")
+            ->where("project_id", "=", "$project_id")
+            ->where_null("deleted_at")
+            ->get();
     }
 }
