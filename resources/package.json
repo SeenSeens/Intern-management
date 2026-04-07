@@ -29,6 +29,7 @@
     "globals": "^17.3.0",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.50.0",
+    "pinia-plugin-persistedstate": "^4.7.1",
     "prettier": "3.8.1",
     "sass-embedded": "^1.97.3",
     "select2": "^4.1.0-rc.0",

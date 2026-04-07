@@ -52,11 +52,11 @@ Hệ thống **không** bao gồm quy trình tuyển chọn và tiếp nhận ba
 ## 4. Phân quyền người dùng (Capabilities)
 Hệ thống sử dụng Custom Capabilities để kiểm soát quyền hạn chính xác tới từng hành động.
 
-| Role                      | Capabilities                                                                                                                   |
-|---------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| **Admin/Project manager** | `create_project`, `edit_project`, `assign_mentor`, `assign_intern`, `view_all_projects`, `view_all_reports`, `manage_settings` |
-| **Mentor**                | `view_assigned_projects`, `assign_intern_to_project`, `view_intern_tasks`, `grade_tasks`, `review_reports`                     |
-| **Intern**                | `view_own_projects`, `create_tasks`, `create_task_details`, `update_task_status`, `submit_reports`                             |
+| Role                      | Capabilities                                                                                                                                     |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Admin/Project manager** | `create_project`, `edit_project`, `delete_project`, `assign_mentor`, `assign_intern`, `view_all_projects`, `view_all_reports`, `manage_settings` |
+| **Mentor**                | `view_assigned_projects`, `assign_intern_to_project`, `view_intern_tasks`, `grade_tasks`, `review_reports`                                       |
+| **Intern**                | `view_own_projects`, `create_tasks`, `create_task_details`, `update_task_status`, `submit_reports`                                               |
 
 ## 5. Cấu trúc Backend (Layered Architecture)
 Hệ thống tuân thủ mô hình phân lớp rành mạch để dễ dàng nâng cấp, bảo trì và cung cấp dữ liệu sạch cho Frontend.

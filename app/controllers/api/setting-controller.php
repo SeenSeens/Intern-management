@@ -16,12 +16,16 @@ class SettingController extends ApiController{
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'get_general'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods' => 'POST',
                 'callback' => [$this, 'update_general'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         /* NOTIFICATION */
@@ -29,12 +33,16 @@ class SettingController extends ApiController{
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'get_notifications'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods' => 'POST',
                 'callback' => [$this, 'update_notifications'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         /* SYSTEM */
@@ -42,17 +50,18 @@ class SettingController extends ApiController{
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'get_system'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods' => 'POST',
                 'callback' => [$this, 'update_system'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
-    }
-    public function permission(): bool{
-        return $this->require_login();
     }
     /* ========= GENERAL ========= */
     public function get_general(){

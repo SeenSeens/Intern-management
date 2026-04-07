@@ -17,12 +17,16 @@ class TaskController extends ApiController{
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'index'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'store'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
 
@@ -30,24 +34,26 @@ class TaskController extends ApiController{
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'show'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'PUT',
                 'callback' => [$this, 'update'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'destroy'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
     }
-    public function permission(): bool{
-        return $this->require_login();
-    }
-
     public function index(WP_REST_Request $request){
         $data['items'] = $this->taskService->get_all_tasks();
         $data['statistics'] = $this->taskService->statistics();

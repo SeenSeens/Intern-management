@@ -33,6 +33,7 @@ if ( file_exists( INTERN_MANAGEMENT_PATH . 'vendor/autoload.php' ) ) {
 }
 register_activation_hook( INTERN_MANAGEMENT_MAIN_FILE, [Database::class, 'activate'] );
 register_deactivation_hook(INTERN_MANAGEMENT_MAIN_FILE, [Database::class, 'drop_table'] );
+
 register_deactivation_hook(INTERN_MANAGEMENT_MAIN_FILE, [Role::class, 'remove_custom_roles'] );
 function intern_run(): void{
     if (class_exists(Plugin::class)) {

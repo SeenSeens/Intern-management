@@ -49,12 +49,18 @@ const router = createRouter({
         {
           path: 'project/new',
           name: 'project-new',
-          component: NewProject
+          component: NewProject,
+          meta: {
+            requiresPermission: 'create_project'
+          }
         },
         {
           path: 'project/edit/:id',
           name: 'project-edit',
-          component: EditProject
+          component: EditProject,
+          meta: {
+            requiresPermission: 'edit_project'
+          }
         },
         {
           path: 'project/view/:id',
@@ -79,15 +85,27 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   if (!auth.checked) {
-    // 👇 delay nhẹ để cookie ổn định
     await new Promise(resolve => setTimeout(resolve, 50))
     await auth.fetchUser()
   }
+  // Chặn người dùng chưa đăng nhập
   if (to.meta.requiresAuth && !auth.user) {
-    next('/login')
-  } else {
-    next()
+    return next({path: '/login', query: { redirect: to.fullPath }})
   }
+  // Chặn người dùng đã đăng nhập nhưng cố quay lại login
+  if(to.path === '/login' && auth.user){
+    return next('/')
+  }
+  // Kiểm tra phân quyền (Capabilities)
+  // Nếu route có quy định quyền cụ thể (vd: requiresPermission: 'create_project')
+  if (to.meta.requiresPermission) {
+    // Gọi hàm hasPermission từ store 'auth'
+    if (!auth.hasPermission(to.meta.requiresPermission)) {
+      // Nếu KHÔNG có quyền, đẩy về trang chủ hoặc trang báo lỗi 403 tuỳ bạn
+      return next('/')
+    }
+  }
+  next()
 })
 
 export default router

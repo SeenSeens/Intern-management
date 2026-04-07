@@ -10,28 +10,14 @@ const api = axios.create({
   },
   withCredentials: true
 });
-let isRefreshing = false;
-let failedQueue = [];
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
 // REQUEST
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('access_token')
+  const authStore = useAuthStore()
   // Nếu là API custom → dùng JWT
-  if (config.url?.includes('/intern/v1/')) {
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    delete config.headers['X-WP-Nonce']
+  if (authStore.accessToken) {
+    config.headers.Authorization = `Bearer ${authStore.accessToken}`
   }
+  //delete config.headers['X-WP-Nonce']
   // Nếu là WP API → dùng nonce
   if (config.url.includes('/wp/v2/')) {
     config.headers['X-WP-Nonce'] = NONCE
@@ -47,43 +33,25 @@ api.interceptors.response.use(
   },
   async err => {
     const originalRequest = err.config
+    const authStore = useAuthStore()
     const url = err.config?.url || ''
     const status = err.response?.status
     const resData = err.response?.data
     // Bắt lỗi 401 và xử lý Refresh Token
-    if (status === 401 && !url.includes('/intern/v1/login') && !url.includes('/intern/v1/refresh-token') && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
-          failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers.Authorization = 'Bearer ' + token;
-          return api(originalRequest);
-        }).catch(err => Promise.reject(err));
-      }
-      originalRequest._retry = true;
-      isRefreshing = true;
-      const authStore = useAuthStore();
-      const refreshToken = authStore.refreshToken;
-      if (!refreshToken) {
-        authStore.logout();
-        return Promise.reject(err);
-      }
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
       try {
-        const { data } = await axios.post(`${API_URL}/intern/v1/refresh-token`, {
-          refresh_token: refreshToken
-        });
-        const newAccessToken = data.access_token || data.data?.access_token;
-        const newRefreshToken = data.refresh_token || data.data?.refresh_token;
-        authStore.setTokens(newAccessToken, newRefreshToken);
-        processQueue(null, newAccessToken);
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
+        const { data } = await axios.post(`${API_URL}intern/v1/refresh-token`, {
+          refresh_token: authStore.refreshToken
+        })
+        // Chỉ cần cập nhật Store, plugin sẽ tự lưu xuống Storage cho bạn
+        authStore.setTokens(data.access_token, data.refresh_token)
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`
+        return api(originalRequest)
       } catch (refreshErr) {
-        processQueue(refreshErr, null);
-        authStore.logout();
-        return Promise.reject(refreshErr);
-      } finally {
-        isRefreshing = false;
+        authStore.logout()
+        window.location.hash = '#/login'
+        return Promise.reject(refreshErr)
       }
     }
     // Lấy message chuẩn từ backend
@@ -95,8 +63,6 @@ api.interceptors.response.use(
     err.message = message
     // Auto logout nếu 401
     if (status === 401 && !url.includes('/intern/v1/login')) {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
       window.location = '#/login'
     }
     return Promise.reject(err)

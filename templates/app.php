@@ -16,10 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 <body>
 <div id="app"></div>
 <script>
-    window.InternApp = {
-        api_url: "<?php echo rest_url(); ?>",
-        nonce: "<?php echo wp_create_nonce('wp_rest'); ?>"
-    };
+    window.InternApp = <?php
+    //$current_user = wp_get_current_user();
+    $intern_app_data = [
+        'api_url' => esc_url_raw( rest_url() ),
+        'nonce'   => wp_create_nonce( 'wp_rest' ),
+        //'caps'    => is_user_logged_in() ? $current_user->allcaps : []
+    ];
+    echo wp_json_encode( $intern_app_data );
+    ?>;
 </script>
 <script type="module" crossorigin src="<?= INTERN_MANAGEMENT_URL . 'resources/dist/js/ims-app.js' ?>"></script>
 </body>

@@ -65,7 +65,8 @@ class AuthController extends ApiController{
                 'id' => $user->ID,
                 'name' => $user->display_name,
                 'email' => $user->user_email,
-                'roles' => $user->roles
+                'roles' => $user->roles,
+                'capabilities' => $user->allcaps
             ]
         ]);
     }

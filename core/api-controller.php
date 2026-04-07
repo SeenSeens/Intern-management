@@ -37,11 +37,11 @@ abstract class ApiController{
     }
     /**
      * Response error chuẩn
-     * @param $message
+     * @param string $message
      * @param int $status
      * @return WP_REST_Response
      */
-    protected function error($message = 'Error', int $status = 400): WP_REST_Response{
+    protected function error(string $message = 'Error', int $status = 400): WP_REST_Response{
         return new WP_REST_Response([
             'success' => false,
             'error'   => $message,

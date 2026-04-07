@@ -49,7 +49,7 @@ const remove = async (id) => {
       </nav>
       <h2 class="text-2xl font-bold tracking-tight">Danh sách theo dõi dự án và phân công</h2>
     </div>
-    <RouterLink :to="{ name: 'project-new' }" class="px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all active:scale-95">
+    <RouterLink v-permission="'create_project'" :to="{ name: 'project-new' }" class="px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all active:scale-95">
       <span class="material-icons text-lg">add</span>
       <span class="font-medium">Thêm dự án</span>
     </RouterLink>
@@ -111,10 +111,10 @@ const remove = async (id) => {
                 <RouterLink :to="{ name: 'project-view', params: { id: project.id } }" class="p-1.5 rounded hover:bg-slate-100 hover:text-amber-500 transition-all" title="Xem">
                   <span class="material-symbols-outlined">visibility</span>
                 </RouterLink>
-                <RouterLink :to="{ name: 'project-edit', params: { id: project.id } }" class="p-1.5 rounded hover:bg-slate-100 hover:text-amber-500 transition-all" title="Sửa">
+                <RouterLink v-permission="'edit_project'" :to="{ name: 'project-edit', params: { id: project.id } }" class="p-1.5 rounded hover:bg-slate-100 hover:text-amber-500 transition-all" title="Sửa">
                   <span class="material-icons text-lg">edit</span>
                 </RouterLink>
-                <button @click="remove(project.id)" class="p-1.5 rounded hover:bg-slate-100 hover:text-red-500 transition-all" title="Xóa">
+                <button v-permission="'delete_project'" @click="remove(project.id)" class="p-1.5 rounded hover:bg-slate-100 hover:text-red-500 transition-all" title="Xóa">
                   <span class="material-icons text-lg">delete</span>
                 </button>
               </div>

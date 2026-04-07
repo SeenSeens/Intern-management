@@ -25,16 +25,17 @@ class UserController extends ApiController{
         register_rest_route($this->namespace, '/users/users_by_role', [
             'methods' => 'GET',
             'callback' => [$this, 'get_users_by_role'],
-            'permission_callback' => [$this, 'permission']
+            'permission_callback' => function(WP_REST_Request $request) {
+                return $this->check_permission($request, []);
+            }
         ]);
         register_rest_route($this->namespace, '/users/count', [
             'methods' => 'GET',
             'callback' => [$this, 'count_users_by_role'],
-            'permission_callback' => [$this, 'permission']
+            'permission_callback' => function(WP_REST_Request $request) {
+                return $this->check_permission($request, []);
+            }
         ]);
-    }
-    public function permission(): bool{
-        return $this->require_login();
     }
     public function index(WP_REST_Request $request): WP_REST_Response{
         $users = get_users();

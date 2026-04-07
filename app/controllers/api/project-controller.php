@@ -42,7 +42,7 @@ class ProjectController extends ApiController{
                 'methods'  => 'POST',
                 'callback' => [$this, 'store'],
                 'permission_callback' => function(WP_REST_Request $request) {
-                    return $this->check_permission($request, []);
+                    return $this->check_permission($request, ['create_project']);
                 }
             ]
         ]);
@@ -50,79 +50,105 @@ class ProjectController extends ApiController{
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'show'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'PUT',
                 'callback' => [$this, 'update'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, ['edit_project']);
+                }
             ],
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'destroy'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, ['delete_project']);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/stats', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'stats'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns/(?P<intern_id>\d+)', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_scores'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
         ]);
         register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/mentors', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_mentor'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'create_project_mentor'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'PUT',
                 'callback' => [$this, 'update_project_mentor'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/mentors/(?P<mentor_id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_mentor'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns', [
             [
                 'methods'  => 'GET',
                 'callback' => [$this, 'view_project_intern'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'POST',
                 'callback' => [$this, 'create_project_intern'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ],
             [
                 'methods'  => 'PUT',
                 'callback' => [$this, 'update_project_intern'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
         register_rest_route($this->namespace, '/projects/(?P<project_id>\d+)/interns/(?P<intern_id>\d+)', [
             [
                 'methods'  => 'DELETE',
                 'callback' => [$this, 'delete_project_intern'],
-                'permission_callback' => [$this, 'permission']
+                'permission_callback' => function(WP_REST_Request $request) {
+                    return $this->check_permission($request, []);
+                }
             ]
         ]);
     }

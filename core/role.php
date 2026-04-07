@@ -38,6 +38,7 @@ class Role {
             'project_manager' => [
                 'create_project',
                 'edit_project',
+                'delete_project',
                 'assign_mentor',
                 'assign_intern',
                 'view_all_projects',

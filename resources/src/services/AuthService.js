@@ -3,14 +3,11 @@ import axios from "axios"
 export default new class AuthService {
   async login(username, password){
     const res = await api.post(`/intern/v1/login`, { username, password })
+    // Bắt lỗi nếu API trả về success là false
     if (!res.data.success) {
-      throw new Error(res.data.error || 'Login failed')
+      throw new Error(res.data.error || res.data.message || 'Login failed')
     }
     const { access_token, refresh_token, user } = res.data.data
-    localStorage.setItem('token', access_token)
-    if (access_token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-    }
     return { user, access_token, refresh_token }
   }
   async meJWT(){
