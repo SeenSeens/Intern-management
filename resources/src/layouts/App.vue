@@ -1,4 +1,4 @@
-<script setup>
+  <script setup>
 import { ref } from 'vue';
 import Sidebar from "@/component/Sidebar.vue";
 import Header from "@/component/Header.vue";
@@ -16,7 +16,7 @@ const toggleSidebar = () => {
     <Sidebar :collapsed="collapsed"/>
     <div class="flex-1 flex flex-col min-w-0">
       <Header @toggleSidebar="toggleSidebar" />
-      <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-background-light">
+      <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-background-light dark:bg-background-dark">
         <RouterView />
         <Footer/>
       </main>

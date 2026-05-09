@@ -1,5 +1,5 @@
 <script setup>
-
+import { Switch } from '@/components/ui/switch'
 </script>
 
 <template>
@@ -42,10 +42,7 @@
               <span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="info">info</span>
               <span class="text-xs text-on-surface-variant">Auto-archive tasks after 30 days of inactivity</span>
             </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input checked="" class="sr-only peer" type="checkbox"/>
-              <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
+            <Switch />
           </div>
         </div>
       </div>

@@ -4,12 +4,8 @@ export const useProjectStore = defineStore('project', {
   state: () => ({
     projects: [],
     project: null,
-    //mentors: [],
-    //interns: [],
     loading: false,
-    meta: [],
     statistics: [],
-    //overall: []
   }),
   actions: {
     async fetchProjects(page = 1) {
@@ -18,7 +14,6 @@ export const useProjectStore = defineStore('project', {
         const response = await ProjectService.getAll()
         const resData = response.data.data
         this.projects = resData.items
-        this.meta  = resData.meta
         this.statistics = resData.statistics
       } catch (error) {
         console.error(error)

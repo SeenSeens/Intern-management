@@ -8,9 +8,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "primary": "#3b82f6",
-        "background-light": "#f8fafc",
-        "background-dark": "#0f172a",
       },
       fontFamily: {
         display: ["Inter", "sans-serif"],
@@ -21,5 +18,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

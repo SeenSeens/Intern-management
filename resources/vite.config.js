@@ -32,6 +32,8 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    allowedHosts: ['wordpress.local'],
+    cors: true,
     proxy: {
       '^/(wp-json|wp-admin|wp-login.php|intern)': {
         target: 'http://wordpress.local',

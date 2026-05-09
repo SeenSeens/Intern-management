@@ -2,7 +2,9 @@
     "name": "tuanpho/intern",
     "autoload": {
         "psr-4": {
-            "InternManagement\\": ""
+            "InternManagement\\": "*",
+            "InternManagement\\Includes\\": "includes",
+            "InternManagement\\Modules\\": "modules"
         },
         "classmap": [ "*" ],
         "files" : [ "plugin.php" ]

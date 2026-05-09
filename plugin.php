@@ -1,6 +1,6 @@
 <?php
 namespace InternManagement;
-use InternManagement\Core\Init;
+use InternManagement\Includes\Init;
 if ( ! defined( 'ABSPATH' ) ) exit;
 final class Plugin {
     const VERSION = '1.0.0';
@@ -12,7 +12,7 @@ final class Plugin {
         }
         return self::$_instance;
     }
-    public function __construct() {
+    private function __construct() {
         if ( !$this->is_compatible() ) return;
         Init::instance();
     }

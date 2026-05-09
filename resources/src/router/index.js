@@ -11,9 +11,12 @@ import App from "@/layouts/App.vue";
 import {useAuthStore} from "@/stores/authStore.js";
 import EditProject from "@/views/project/EditProject.vue";
 import DetailProject from "@/views/project/DetailProject.vue";
+import DetailTask from "@/views/task/DetailTask.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
+  //linkActiveClass: 'active-nav',
+  linkExactActiveClass: 'active-nav',
   routes: [
     {
       path: '/login',

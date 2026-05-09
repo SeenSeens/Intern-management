@@ -54,7 +54,7 @@ const currentTab = computed(() => tabComponents[activeTab.value])
   <div class="flex gap-8 max-w-6xl">
 	  <!-- Inner Sidebar (Sub-navigation) -->
 	  <div class="w-72 flex flex-col gap-1 shrink-0">
-	    <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all" :class="activeTab === tab.key ? 'bg-white shadow-sm border border-slate-200 text-primary' : 'text-slate-600 hover:bg-white hover:shadow-sm'">
+	    <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all " :class="activeTab === tab.key ? 'bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-white hover:shadow-sm'">
 	    	<span class="material-symbols-outlined">{{ tab.icon }}</span>
 	    	<span class="text-sm font-medium">{{ tab.label }}</span>
 	  	</button>

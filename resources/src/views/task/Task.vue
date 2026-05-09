@@ -69,36 +69,39 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-slate-50 border-b border-slate-200">
-            <th class="px-6 py-4 text-xs font-semibold uppercase  w-16">No.</th>
-            <th class="px-6 py-4 text-xs font-semibold uppercase">Tên nhiệm vụ</th>
-            <th class="px-6 py-4 text-xs font-semibold uppercase">Ngày bắt đầu</th>
-            <th class="px-6 py-4 text-xs font-semibold uppercase">Ngày kết thúc</th>
-            <th class="px-6 py-4 text-xs font-semibold uppercase">Dự án</th>
-            <th class="px-6 py-4 text-xs font-semibold uppercase text-right">Actions</th>
+          <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest w-12">No.</th>
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest">Tên nhiệm vụ</th>
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest">Ngày bắt đầu</th>
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest">Ngày kết thúc</th>
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest">Dự án</th>
+            <th class="px-6 py-2.5 text-xs font-semibold tracking-widest text-right">Thao tác</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-200">
-          <tr class="hover:bg-slate-50 transition-colors group" v-for="(task, index) in taskStore.tasks" key="task.id">
-            <td class="px-6 py-4 text-sm text-slate-500">{{ index + 1 }}</td>
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-3">
-                <span class="font-medium">{{ task.title }}</span>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group" v-for="(task, index) in taskStore.tasks" key="task.id">
+            <td class="px-6 py-2.5 text-sm text-slate-500">{{ index + 1 }}</td>
+            <td class="px-6 py-2.5 font-semibold text-slate-900 dark:text-white text-sm">{{ task.title }}</td>
+            <td class="px-6 py-2.5 text-sm font-medium">{{ task.start_date }}</td>
+            <td class="px-6 py-2.5 text-sm font-medium">{{ task.end_date }}</td>
+            <td class="px-6 py-2.5 text-sm font-medium">{{ task.project_name }}</td>
+            <td class="px-6 py-2.5 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <div class="w-px h-4 bg-slate-200 mx-1"></div>
+                <RouterLink class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Xem">
+                  <span class="material-symbols-outlined">visibility</span>
+                </RouterLink>
+                <RouterLink v-permission="'edit_project'" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Sửa">
+                  <span class="material-icons text-lg">edit</span>
+                </RouterLink>
+                <button v-permission="'delete_project'" @click="remove(task.id)" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all text-slate-500 dark:text-slate-400" title="Xóa">
+                  <span class="material-icons text-lg">delete</span>
+                </button>
               </div>
-            </td>
-            <td class="px-6 py-4 text-sm font-medium">{{ task.start_date }}</td>
-            <td class="px-6 py-4 text-sm font-medium">{{ task.end_date }}</td>
-            <td class="px-6 py-4">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">{{ task.project_name }}</span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <a class="text-primary hover:text-blue-700 font-semibold text-sm inline-flex items-center gap-1" href="#">
-                Assign work <span class="material-icons text-sm">arrow_forward</span>
-              </a>
             </td>
           </tr>
         </tbody>

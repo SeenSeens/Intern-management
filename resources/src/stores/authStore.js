@@ -10,7 +10,8 @@ export const useAuthStore = defineStore('auth', {
     permissions: [],
   }),
   getters: {
-    isLoggedIn: (state) => !!state.user,
+    // Kiểm tra đã đăng nhập chưa (phải có cả user và token)
+    isLoggedIn: (state) => !!state.user && !state.accessToken,
     // Hàm dùng chung để check xem user có 1 quyền cụ thể hay không
     hasPermission: (state) => {
       return (permissionName) => state.permissions.includes(permissionName)
@@ -42,8 +43,11 @@ export const useAuthStore = defineStore('auth', {
         if (user?.capabilities) {
           this.permissions = Object.keys(user.capabilities)
         }
+        // Gọi API /me để lấy thông tin User dựa trên Token vừa nhận
+        await this.fetchUser()
         this.checked = true
       } catch (e) {
+        this.clearAuth()
         throw new Error(e.response?.data?.error || e.message)
       } finally {
         this.loading = false

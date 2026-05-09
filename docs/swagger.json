@@ -13,11 +13,11 @@
   ],
   "components": {
     "securitySchemes": {
-      "wpNonce": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-WP-Nonce",
-        "description": "WordPress REST API Nonce"
+      "jwtAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Nhập JWT token của bạn vào đây (không cần thêm chữ Bearer ở trước)"
       }
     },
     "schemas": {

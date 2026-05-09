@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     <title>Hệ thống IMS</title>
     <link rel="stylesheet" crossorigin href="<?= INTERN_MANAGEMENT_URL . 'resources/dist/css/ims-style.css' ?>">
 </head>
-<body>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden">
 <div id="app"></div>
 <script>
     window.InternApp = <?php

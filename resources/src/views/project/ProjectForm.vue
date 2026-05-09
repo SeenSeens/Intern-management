@@ -27,10 +27,10 @@ onMounted(async () => {
 })
 
 const statusOptions = [
-  { label: "In Progress", value: "in_progress" },
-  { label: "Waiting", value: "waiting" },
-  { label: "On Hold", value: "on_hold" },
-  { label: "Completed", value: "completed" }
+  { label: "Đang xử lý", value: "in_progress" },
+  { label: "Đang chờ", value: "waiting" },
+  { label: "Tạm giữ", value: "on_hold" },
+  { label: "Hoàn thành", value: "completed" }
 ]
 
 const { handleSubmit, errors, defineField, setValues } = useForm({
