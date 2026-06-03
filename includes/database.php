@@ -15,10 +15,8 @@ class Database {
         $table_project_mentors = $wpdb->prefix . 'intern_project_mentors';
         $table_project_interns = $wpdb->prefix . 'intern_project_interns';
         $table_tasks = $wpdb->prefix . 'intern_tasks';
-        $table_task_assignees = $wpdb->prefix . 'intern_task_assignees';
         $table_task_details = $wpdb->prefix . 'intern_task_details';
         $table_reports = $wpdb->prefix . 'intern_reports';
-        $table_scores = $wpdb->prefix . 'intern_task_scores';
         //$table_report_comments = $wpdb->prefix . 'intern_report_comments';
         $sql = [];
         $sql[] = "CREATE TABLE {$table_projects} (
@@ -29,6 +27,7 @@ class Database {
             `manager_id` BIGINT UNSIGNED NOT NULL,
             `start_date` DATE DEFAULT NULL,
             `end_date` DATE DEFAULT NULL,
+            `current_score` DECIMAL(3,1) DEFAULT NULL,
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `deleted_at` DATETIME DEFAULT NULL,
@@ -68,11 +67,12 @@ class Database {
         $sql[] = "CREATE TABLE {$table_tasks} (
             `id` BIGINT UNSIGNED AUTO_INCREMENT,
             `project_id` BIGINT UNSIGNED NOT NULL,
+            `intern_id` BIGINT UNSIGNED NOT NULL,
             `title` VARCHAR(255) NOT NULL,
             `description` TEXT,
             `priority` ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
-            `max_score` INT DEFAULT 10,
-            `assigned_by` BIGINT UNSIGNED NOT NULL,
+            `current_score` DECIMAL(3,1) DEFAULT NULL,
+            `completion_percent` INT DEFAULT 0,
             `status` ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
             `start_date` DATE DEFAULT NULL,
             `end_date` DATE DEFAULT NULL,
@@ -81,16 +81,7 @@ class Database {
             `deleted_at` DATETIME DEFAULT NULL,
             PRIMARY KEY (`id`),
             KEY `project_id` (`project_id`),
-            KEY `assigned_by` (`assigned_by`)
-        ) $charset_collate;";
-        $sql[] = "CREATE TABLE {$table_task_assignees} (
-            `id` BIGINT UNSIGNED AUTO_INCREMENT,
-            `task_id` BIGINT UNSIGNED NOT NULL,
-            `user_id` BIGINT UNSIGNED NOT NULL,
-            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            `deleted_at` DATETIME DEFAULT NULL,
-            PRIMARY KEY (`id`)
+            KEY `intern_id` (`intern_id`)
         ) $charset_collate;";
         $sql[] = "CREATE TABLE {$table_task_details} (
             `id` BIGINT UNSIGNED AUTO_INCREMENT,
@@ -98,6 +89,9 @@ class Database {
             `title` VARCHAR(255) NOT NULL,
             `description` TEXT,
             `status` ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
+            `score` DECIMAL(3,1) DEFAULT 0,
+            `evaluated_by` BIGINT UNSIGNED DEFAULT NULL,
+            `evaluated_at` DATETIME DEFAULT NULL,
             `created_by` BIGINT UNSIGNED NOT NULL,
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -115,9 +109,6 @@ class Database {
             `content` TEXT,
             `progress` INT DEFAULT 0,
             `report_date` DATE,
-            `week_number` INT,
-            `month` INT,
-            `year` INT,
             `status` ENUM('submitted','reviewed','approved','rejected') DEFAULT 'submitted',
             `reviewed_by` BIGINT UNSIGNED DEFAULT NULL,
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -128,19 +119,6 @@ class Database {
             KEY `project_id` (project_id),
             KEY `intern_id` (intern_id),
             KEY `reviewed_by` (reviewed_by)
-        ) $charset_collate;";
-        $sql[] = "CREATE TABLE {$table_scores}(
-            `id` BIGINT UNSIGNED AUTO_INCREMENT,
-            `intern_id` BIGINT UNSIGNED NOT NULL,
-            `task_id` BIGINT UNSIGNED DEFAULT NULL,
-            `score` INT NOT NULL,
-            `evaluated_by` BIGINT UNSIGNED NOT NULL,
-            `comment` TEXT,
-            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-            `deleted_at` DATETIME DEFAULT NULL,
-            PRIMARY KEY (id),
-            KEY `intern_id` (intern_id),
-            KEY `task_id` (task_id)
         ) $charset_collate;";
         foreach ($sql as $query) {
             dbDelta($query);
@@ -155,7 +133,6 @@ class Database {
         $table_task_assignees = $wpdb->prefix . 'intern_task_assignees';
         $table_task_details = $wpdb->prefix . 'intern_task_details';
         $table_reports = $wpdb->prefix . 'intern_reports';
-        $table_scores = $wpdb->prefix . 'intern_task_scores';
         //$table_report_comments = $wpdb->prefix . 'intern_report_comments';
         $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_projects");
         if ($count > 0) return;
@@ -194,22 +171,14 @@ class Database {
             for($t=1;$t<=4;$t++){
                 $wpdb->insert($table_tasks,[
                     'project_id'=>$project,
+                    'intern_id'=>$intern_ids[array_rand($intern_ids)],
                     'title'=>"Task $t Project $project",
                     'description'=>"Development task",
                     'priority'=>['low','medium','high'][array_rand([0,1,2])],
-                    'assigned_by'=>$mentor_ids[array_rand($mentor_ids)],
                     'status'=>['pending','in_progress','completed'][array_rand([0,1,2])]
                 ]);
                 $task_id=$wpdb->insert_id;
                 $task_ids[]=$task_id;
-                foreach($intern_ids as $intern){
-                    if(rand(0,1)){
-                        $wpdb->insert($table_task_assignees,[
-                            'task_id'=>$task_id,
-                            'user_id'=>$intern
-                        ]);
-                    }
-                }
                 for($d=1;$d<=3;$d++){
                     $wpdb->insert($table_task_details,[
                         'task_id'=>$task_id,
@@ -237,15 +206,6 @@ class Database {
                 ]);
             }
         }
-        for($s=1;$s<=30;$s++){
-            $wpdb->insert($table_scores,[
-                'intern_id'=>$intern_ids[array_rand($intern_ids)],
-                'task_id'=>$task_ids[array_rand($task_ids)],
-                'score'=>rand(6,10),
-                'evaluated_by'=>$mentor_ids[array_rand($mentor_ids)],
-                'comment'=>"Good job"
-            ]);
-        }
     }
     public static function drop_table(): void{
         global $wpdb;
@@ -262,10 +222,8 @@ class Database {
             'table_project_mentors' => $wpdb->prefix . 'intern_project_mentors',
             'table_project_interns' => $wpdb->prefix . 'intern_project_interns',
             'table_tasks' => $wpdb->prefix . 'intern_tasks',
-            'table_task_assignees' => $wpdb->prefix . 'intern_task_assignees',
             'table_task_details' => $wpdb->prefix . 'intern_task_details',
             'table_reports' => $wpdb->prefix . 'intern_reports',
-            'table_scores' => $wpdb->prefix . 'intern_task_scores'
         ];
     }
 }

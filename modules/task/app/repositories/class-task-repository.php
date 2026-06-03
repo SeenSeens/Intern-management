@@ -100,4 +100,17 @@ class TaskRepository extends BaseRepository{
         return $this->where("project_id", "=", $project_id)
             ->delete_query();
     }
+    // Get task
+    public function get_task(int $id){
+        $projects = $this->db->prefix . 'intern_projects';
+        $users = $this->db->users;
+        return $this->select('t.*, p.name as project_name, u.ID, u.display_name')
+            ->from("{$this->table} t")
+            ->join("$projects p", "p.id = t.project_id")
+            ->join("$users u", "u.ID = t.intern_id")
+            ->where("t.id", "=", $id)
+            ->where_null("t.deleted_at")
+            ->where_null("p.deleted_at")
+            ->first();
+    }
 }

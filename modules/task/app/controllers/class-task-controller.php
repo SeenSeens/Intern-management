@@ -1,8 +1,10 @@
 <?php
 namespace InternManagement\Modules\Task\App\Controllers;
+use Exception;
 use InternManagement\Includes\ApiController;
 use InternManagement\Includes\Helper;
 use InternManagement\Modules\Task\App\Actions\TaskAction;
+use InternManagement\Modules\Task\App\Services\TaskDetailService;
 use InternManagement\Modules\Task\App\Services\TaskService;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -10,10 +12,12 @@ use WP_REST_Server;
 class TaskController extends ApiController{
     private TaskService $taskService;
     private TaskAction $taskAction;
+    private $taskDetailService;
     public function __construct(){
         parent::__construct();
         $this->taskService = new TaskService();
         $this->taskAction = new TaskAction();
+        $this->taskDetailService = new TaskDetailService();
     }
 
     protected function register_routes(): void{
@@ -114,6 +118,16 @@ class TaskController extends ApiController{
             return $this->error($e->getMessage(), 422);
         }
 
+    }
+    public function show(WP_REST_Request $request){
+        try {
+            $id = (int) $request['id'];
+            $data['task'] = $this->taskService->get_task($id);
+            $data['task_detail'] = $this->taskDetailService->get_task_detail_by_task_id($id);
+            return $this->success($data);
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
     }
     public function destroy(WP_REST_Request $request){
         $params = $request->get_json_params() ?? $request->get_params();

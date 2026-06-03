@@ -237,7 +237,6 @@ abstract class Action {
         switch ($this->request_type()) {
             case 'rest':
                 return new WP_REST_Response($data, $status);
-                break;
             case 'ajax':
                 wp_send_json($data, $status);
                 break;

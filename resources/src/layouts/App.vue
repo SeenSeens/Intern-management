@@ -3,12 +3,12 @@ import { ref } from 'vue';
 import Sidebar from "@/component/Sidebar.vue";
 import Header from "@/component/Header.vue";
 import Footer from "@/component/Footer.vue";
-
+import {useModalStore} from "@/stores/modalStore.js";
 const collapsed = ref(false);
-
 const toggleSidebar = () => {
   collapsed.value = !collapsed.value;
 };
+const modalStore = useModalStore()
 </script>
 
 <template>
@@ -22,6 +22,9 @@ const toggleSidebar = () => {
       </main>
     </div>
   </div>
+  <component
+    v-if="modalStore.isOpen"
+    :is="modalStore.component"
+    v-bind="modalStore.props"
+  />
 </template>
-
-<style scoped></style>

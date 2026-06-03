@@ -134,7 +134,7 @@ class Helper {
     public static function jwt_encode($user, $type = 'access'){
         $expiration = ($type === 'refresh')
             ? time() + (60 * 60 * 24 * 7)
-            : time() + (15 * 60);
+            : time() + (60 * 60);
         $payload = [
             'iss' => get_site_url(),
             'iat' => time(),

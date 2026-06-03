@@ -76,6 +76,11 @@ const router = createRouter({
           component: Task
         },
         {
+          path: 'task/view/:id',
+          name: 'task-view',
+          component: DetailTask
+        },
+        {
           path: 'setting',
           name: 'setting',
           component: Setting

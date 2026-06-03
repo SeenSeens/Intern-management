@@ -207,12 +207,12 @@ trait QueryBuilder {
     /**
      * THÊM HOẶC CẬP NHẬT (ON DUPLICATE KEY UPDATE)
      * @param $data
-     * @param $updateFields
+     * @param array $updateFields
      * @param $parentId
-     * @param $parentKey
+     * @param string $parentKey
      * @return bool
      */
-    public function insert_or_update( $data, $updateFields = [], $parentId = null, $parentKey = '' ): bool{
+    public function insert_or_update($data, array $updateFields = [], $parentId = null, string $parentKey = '' ): bool{
         if ( $parentId !== null && $parentKey !== '' ) {
             $data[$parentKey] = $parentId;
         }

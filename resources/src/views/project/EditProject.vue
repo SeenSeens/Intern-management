@@ -39,7 +39,7 @@ const submit = async (data) => {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto">
+  <div class="mx-auto">
     <div class="mb-8">
       <nav class="flex mb-4 text-sm text-slate-500 gap-2 items-center">
         <a class="hover:text-primary" href="#">Dự án</a>

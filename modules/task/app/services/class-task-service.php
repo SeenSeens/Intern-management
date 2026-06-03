@@ -30,4 +30,7 @@ class TaskService extends BaseService {
     public function delete_by_project(int $project_id): bool{
         return $this->repository->delete_by_project($project_id);
     }
+    public function get_task(int $id){
+        return $this->repository->get_task($id);
+    }
 }

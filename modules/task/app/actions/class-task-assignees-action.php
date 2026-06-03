@@ -6,11 +6,15 @@ use InternManagement\Modules\Task\App\Services\TaskAssigneesService;
 if ( ! defined( 'ABSPATH' ) ) exit;
 class TaskAssignessAction extends BaseAction {
 
-    public function __construct($service = null){
-        parent::__construct(new TaskAssigneesService());
-    }
 
     protected function map_input(): array{
-        // TODO: Implement map_input() method.
+        return [
+            'id' => (int)$this->get('id'),
+            'task_id' => (int)$this->get('task_id'),
+            'title' => $this->get('title'),
+            'description' => $this->get('description'),
+            'status' => $this->get('status'),
+            'created_by' => $this->get('created_by'),
+        ];
     }
 }

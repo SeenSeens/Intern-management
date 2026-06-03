@@ -63,15 +63,35 @@ class BaseRepository implements BaseRepositoryInterface{
      * @param int $id
      * @return bool
      */
-    public function delete(int $id) {
+    public function delete(int $id): bool{
+        $this->where('id', '=', $id);
         if ($this->softDelete) {
-            return (bool) $this->db->update(
-                $this->table,
-                ['deleted_at' => current_time('mysql')],
-                ['id' => $id]
-            );
+            return $this->update_query([
+                'deleted_at' => current_time('mysql')
+            ]);
         }
-        return (bool) $this->db->delete($this->table, ['id' => $id]);
+        return $this->delete_query();
+    }
+
+    /**
+     * Xóa hàng loạt theo mảng điều kiện
+     * Ví dụ: $this->deleteWhere(['task_id' => 5, 'status' => 'pending']);
+     * @param array $conditions
+     * @return bool
+     */
+    public function delete_where(array $conditions): bool {
+        if (empty($conditions)) {
+            return false;
+        }
+        foreach ($conditions as $column => $value) {
+            $this->where($column, '=', $value);
+        }
+        if ($this->softDelete) {
+            return $this->update_query([
+                'deleted_at' => current_time('mysql')
+            ]);
+        }
+        return $this->delete_query();
     }
 
     // Pagination Interface

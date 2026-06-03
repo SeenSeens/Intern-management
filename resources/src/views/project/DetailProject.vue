@@ -5,6 +5,7 @@ import {useProjectStore} from "@/stores/projectStore.js"
 import Swal from "sweetalert2";
 import StatusBadge from "@/component/StatusBadge.vue";
 import PriorityBadge from "@/component/PriorityBadge.vue";
+import BaseModal from "@/component/BaseModal.vue";
 
 const viewMode = ref('board') // 'board' | 'list'
 
@@ -342,39 +343,36 @@ watch(showModal, (val) => {
             <button @click="showModal = true" v-permission="['assign_mentor', 'assign_intern', 'assign_intern_to_project']" class="mt-4 w-full py-2 text-sm text-primary font-medium hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-primary/30">
               + Thêm thành viên
             </button>
-            <!-- Modal -->
-            <div v-if="showModal" @click.self="showModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
-              <div class="bg-white   w-full max-w-lg rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-
-                <!-- Header -->
-                <div class="px-6 py-4 border-b flex justify-between">
-                  <h3 class="text-lg font-bold">Add Members to Project</h3>
-
-                  <!-- ❌ Close -->
-                  <button @click="showModal = false">
-                    <span class="material-symbols-outlined">close</span>
-                  </button>
-                </div>
-
-                <!-- Body giữ nguyên của bạn -->
-                <div class="p-6 space-y-5">
-                  <!-- ... giữ nguyên code bạn -->
-                </div>
-
-                <!-- Footer -->
-                <div class="px-6 py-4 flex justify-end gap-3">
-                  <button @click="showModal = false">
-                    Cancel
-                  </button>
-
-                  <button class="bg-primary px-5 py-2 rounded-lg">
-                    Add Members
-                  </button>
-                </div>
-
-              </div>
-            </div>
           </div>
+          <Teleport to="body">
+            <!-- use the modal component, pass in the prop -->
+            <BaseModal :show="showModal" @close="showModal = false">
+              <template #header>
+                <h3 class="text-lg font-semibold text-center">Phân công lại thành viên</h3>
+              </template>
+              <template #body>
+                <div class="space-y-3">
+                  <p class="text-sm font-semibold text-center text-slate-600">Vui lòng chọn 1 thực tập sinh mới để thực hiện nhiệm vụ này.</p>
+                  <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-lg">person</span> Người thực hiện
+                  </label>
+                </div>
+              </template>
+              <template #footer>
+                <button @click="showModal = false"
+                  class="rounded-lg border px-4 py-1.5 bg-gray-200 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-300"
+                >
+                  Hủy
+                </button>
+                <button
+                  @click="showModal = false"
+                  class="rounded-lg bg-blue-500 px-4 py-1.5 text-sm font-bold text-white transition-colors hover:bg-blue-600"
+                >
+                  Xác nhận
+                </button>
+              </template>
+            </BaseModal>
+          </Teleport>
         </div>
       </div>
     </div>

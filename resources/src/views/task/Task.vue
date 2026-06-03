@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import {useTaskStore} from "@/stores/taskStore.js";
+import Swal from "sweetalert2";
 
 const taskStore = useTaskStore();
 onMounted(async () => {
@@ -10,6 +11,20 @@ onMounted(async () => {
     console.error("API Error:", err);
   }
 })
+const remove = async (id) => {
+  const result = await Swal.fire({
+    title: 'Bạn chắc chắn muốn xoá task này?',
+    text: "Dữ liệu sẽ bị xoá!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Xoá',
+    cancelButtonText: 'Huỷ'
+  })
+
+  if (result.isConfirmed) {
+    await taskStore.removeTask(id)
+  }
+}
 </script>
 
 <template>
@@ -92,13 +107,13 @@ onMounted(async () => {
             <td class="px-6 py-2.5 text-right">
               <div class="flex items-center justify-end gap-1">
                 <div class="w-px h-4 bg-slate-200 mx-1"></div>
-                <RouterLink class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Xem">
+                <RouterLink :to="{ name: 'task-view', params: { id: task.id }}" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Xem" >
                   <span class="material-symbols-outlined">visibility</span>
                 </RouterLink>
-                <RouterLink v-permission="'edit_project'" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Sửa">
+                <RouterLink to="" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-500 transition-all" title="Sửa" >
                   <span class="material-icons text-lg">edit</span>
                 </RouterLink>
-                <button v-permission="'delete_project'" @click="remove(task.id)" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all text-slate-500 dark:text-slate-400" title="Xóa">
+                <button @click="remove(task.id)" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all text-slate-500 dark:text-slate-400" title="Xóa">
                   <span class="material-icons text-lg">delete</span>
                 </button>
               </div>

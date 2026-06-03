@@ -1,68 +1,71 @@
 [//]: # (Đặc tả)
 ## Đặc tả
-| Thành phần                       | Mô tả nghiệp vụ                                                                |
-|----------------------------------|--------------------------------------------------------------------------------|
-| **Dự án (`wp_intern_projects`)** | Mỗi dự án do 1 Project Manager tạo                                             |
-| **Thực tập sinh (`interns`)**    | Được gán vào các dự án thông qua bảng liên kết                                 |
-| **Thực tập sinh (`mentors`)**    | Được gán vào các dự án thông qua bảng liên kết                                 |
-| **Nhiệm vụ (`wp_intern_task`)**  | Là các task nhỏ trong 1 dự án, giao cho intern thực hiện, có mô tả và deadline |
+| Thành phần                             | Mô tả nghiệp vụ                                                                |
+|----------------------------------------|--------------------------------------------------------------------------------|
+| **Dự án (`intern_projects`)**          | Mỗi dự án do 1 Project Manager tạo                                             |
+| **Thực tập sinh (`interns`)**          | Được gán vào các dự án thông qua bảng liên kết                                 |
+| **Thực tập sinh (`mentors`)**          | Được gán vào các dự án thông qua bảng liên kết                                 |
+| **Nhiệm vụ (`intern_task`)**           | Là các task nhỏ trong 1 dự án, giao cho intern thực hiện, có mô tả và deadline |
+| **Nhiệm vụ chi tiết (`task_details`)** | Nhiệm vụ chi tiết trong 1 task cụ thể                                          |
+| **Báo cáo (`reports`)**                | Báo cáo                                                                        |
+| **Điểm số (`task_scores`)**            | Điểm số của task                                                               |
 
 [//]: # (Bảng Project)
 ## wp_intern_projects
-| Cột           | Kiểu dữ liệu                                        | Mô tả                                                                    |
-|---------------|-----------------------------------------------------|--------------------------------------------------------------------------|
-| `id`          | BIGINT (PK)                                         | ID dự án                                                                 |
-| `name`        | VARCHAR(255)                                        | Tên dự án                                                                |
-| `description` | TEXT                                                | Mô tả dự án                                                              |
-| `status`      | ENUM(`in_progress`,`waiting`,`on_hold`,`completed`) | Trạng thái (`đang triển khai`, `đang chờ`, `tạm dừng`, `hoàn thành`,...) |
-| `manager_id`  | BIGINT                                              | user_id của Project Manager                                              |
-| `start_date`  | DATE                                                | Ngày bắt đầu dự án                                                       |
-| `end_date`    | DATE                                                | Ngày kết thúc dự án                                                      |
-| `created_at`  | DATETIME                                            | Ngày tạo                                                                 |
-| `updated_at`  | DATETIME                                            | Cập nhật cuối cùng                                                       |
-| `deleted_at`  | DATETIME                                            | Ngày xóa                                                                 |
+| Cột           | Kiểu dữ liệu                                                            | Mô tả                                                                                     |
+|---------------|-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| `id`          | BIGINT (PK)                                                             | ID dự án                                                                                  |
+| `name`        | VARCHAR(255)                                                            | Tên dự án                                                                                 |
+| `description` | TEXT                                                                    | Mô tả dự án                                                                               |
+| `status`      | ENUM(`in_progress`,`waiting`,`on_hold`,`completed`) default (`waiting`) | Trạng thái (`đang triển khai`, `đang chờ`, `tạm dừng`, `hoàn thành`) mặc định (`waiting`) |
+| `manager_id`  | BIGINT                                                                  | user_id của Project Manager (Người tạo ra project này)                                    |
+| `start_date`  | DATE                                                                    | Ngày bắt đầu dự án                                                                        |
+| `end_date`    | DATE                                                                    | Ngày kết thúc dự án                                                                       |
+| `created_at`  | DATETIME                                                                | Ngày tạo                                                                                  |
+| `updated_at`  | DATETIME                                                                | Cập nhật cuối cùng                                                                        |
+| `deleted_at`  | DATETIME                                                                | Ngày xóa                                                                                  |
 
 [//]: # (Bảng liên kết N-N: Project – Intern)
 ## wp_intern_project_interns - liên kết Intern với dự án
-| Cột           | Kiểu dữ liệu | Mô tả                               |
-|---------------|--------------|-------------------------------------|
-| `id`          | BIGINT (PK)  |                                     |
-| `project_id`  | BIGINT       | FK → `wp_intern_projects.id`        |
-| `intern_id`   | BIGINT       | FK → `wp_users.ID` (vai trò intern) |
-| `assigned_by` | BIGINT       | FK → `wp_users.ID`                  |
-| `created_at`  | DATETIME     | Ngày tạo                            |
-| `updated_at`  | DATETIME     | Cập nhật cuối cùng                  |
-| `deleted_at`  | DATETIME     | Ngày xóa                            |
+| Cột           | Kiểu dữ liệu | Mô tả                             |
+|---------------|--------------|-----------------------------------|
+| `id`          | BIGINT (PK)  |                                   |
+| `project_id`  | BIGINT       | FK → `intern_projects.id`         |
+| `intern_id`   | BIGINT       | FK → `users.ID` (vai trò intern)  |
+| `assigned_by` | BIGINT       | FK → `users.ID` (Ai là người gán) |
+| `created_at`  | DATETIME     | Ngày tạo                          |
+| `updated_at`  | DATETIME     | Cập nhật cuối cùng                |
+| `deleted_at`  | DATETIME     | Ngày xóa                          |
 
 [//]: # (Bảng liên kết N-N: Project – Mentor)
 ## wp_intern_project_mentors - liên kết Mentor với dự án
-| Cột           | Kiểu dữ liệu | Mô tả                               |
-|---------------|--------------|-------------------------------------|
-| `id`          | BIGINT (PK)  |                                     |
-| `project_id`  | BIGINT       | FK → `wp_intern_projects.id`        |
-| `mentor_id`   | BIGINT       | FK → `wp_users.ID` (vai trò mentor) |
-| `assigned_by` | BIGINT       | FK → `wp_users.ID`                  |
-| `created_at`  | DATETIME     | Ngày tạo                            |
-| `updated_at`  | DATETIME     | Cập nhật cuối cùng                  |
-| `deleted_at`  | DATETIME     | Ngày xóa                            |
+| Cột           | Kiểu dữ liệu | Mô tả                                |
+|---------------|--------------|--------------------------------------|
+| `id`          | BIGINT (PK)  |                                      |
+| `project_id`  | BIGINT       | FK → `wp_intern_projects.id`         |
+| `mentor_id`   | BIGINT       | FK → `wp_users.ID` (vai trò mentor)  |
+| `assigned_by` | BIGINT       | FK → `wp_users.ID` (Ai là người gán) |
+| `created_at`  | DATETIME     | Ngày tạo                             |
+| `updated_at`  | DATETIME     | Cập nhật cuối cùng                   |
+| `deleted_at`  | DATETIME     | Ngày xóa                             |
 
 [//]: # (Bảng Task)
 ## wp_intern_task
-| Cột           | Kiểu dữ liệu                                | Mô tả                                                                        |
-|---------------|---------------------------------------------|------------------------------------------------------------------------------|
-| `id`          | BIGINT (PK)                                 | ID của nhiệm vụ                                                              |
-| `project_id`  | BIGINT                                      | FK → `wp_intern_projects.id`                                                 |
-| `title`       | VARCHAR(255)                                | Tên nhiệm vụ                                                                 |
-| `description` | TEXT                                        | Mô tả chi tiết nhiệm vụ                                                      |
-| `priority`    | ENUM(`low`, `medium`, `high`, `critical`)   | Phân loại mức độ ưu tiên để sắp lịch `Thấp`, `Trung bình`, `Cao`, `Khẩn cấp` |
-| `max_score`   | INT                                         | Điểm tối đa                                                                  |
-| `assigned_by` | BIGINT                                      |                                                                              |
-| `status`      | ENUM(`pending`, `in_progress`, `completed`) | Trạng thái `Đã giao`, `Đang thực hiện`, `Hoàn thành`                         |
-| `start_date`  | DATETIME                                    | Thời điểm chính thức bắt đầu                                                 |
-| `end_date`    | DATE                                        | Thời điểm kết thúc                                                           |
-| `created_at`  | DATETIME                                    | Ngày tạo                                                                     |
-| `updated_at`  | DATETIME                                    | Ngày cập nhật                                                                |
-| `deleted_at`  | DATETIME                                    | Ngày xóa                                                                     |
+| Cột           | Kiểu dữ liệu                                                 | Mô tả                                                                                                |
+|---------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| `id`          | BIGINT (PK)                                                  |                                                                                                      |
+| `project_id`  | BIGINT                                                       | FK → `wp_intern_projects.id`                                                                         |
+| `title`       | VARCHAR(255)                                                 | Tên nhiệm vụ                                                                                         |
+| `description` | TEXT                                                         | Mô tả chi tiết nhiệm vụ                                                                              |
+| `priority`    | ENUM(`low`, `medium`, `high`, `critical`) DEFAULT (`medium`) | Phân loại mức độ ưu tiên để sắp lịch `thấp`, `trung bình`, `cao`, `khẩn cấp` Mặc định (`trung bình`) |
+| `max_score`   | INT                                                          | Điểm tối đa                                                                                          |
+| `assigned_by` | BIGINT                                                       |                                                                                                      |
+| `status`      | ENUM(`pending`, `in_progress`, `completed`)                  | Trạng thái `Đã giao`, `Đang thực hiện`, `Hoàn thành`                                                 |
+| `start_date`  | DATETIME                                                     | Thời điểm chính thức bắt đầu                                                                         |
+| `end_date`    | DATE                                                         | Thời điểm kết thúc                                                                                   |
+| `created_at`  | DATETIME                                                     | Ngày tạo                                                                                             |
+| `updated_at`  | DATETIME                                                     | Ngày cập nhật                                                                                        |
+| `deleted_at`  | DATETIME                                                     | Ngày xóa                                                                                             |
 
 [//]: # (Bảng liên kết: Task - Intern)
 ## wp_intern_task_assignees

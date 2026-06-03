@@ -2,7 +2,7 @@
     "name": "tuanpho/intern",
     "autoload": {
         "psr-4": {
-            "InternManagement\\": "*",
+            "InternManagement\\App\\": "app",
             "InternManagement\\Includes\\": "includes",
             "InternManagement\\Modules\\": "modules"
         },

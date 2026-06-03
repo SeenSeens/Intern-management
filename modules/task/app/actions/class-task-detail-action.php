@@ -7,7 +7,7 @@ use InternManagement\Modules\Task\App\Services\TaskDetailService;
 use InternManagement\Modules\Task\App\Services\TaskService;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
-class TaskAction extends BaseAction {
+class TaskDetailAction extends BaseAction {
     protected array $allow_html = ['description'];
     protected function validate(): array {
         $errors = [];
@@ -20,23 +20,8 @@ class TaskAction extends BaseAction {
             if (empty($this->get('description'))) {
                 $errors['description'] = 'Mô tả task không được để trống.';
             }
-            if (empty($this->get('priority'))) {
-                $errors['priority'] = 'Tên dự án không được để trống.';
-            }
-            if (empty($this->get('max_score'))) {
-                $errors['max_score'] = 'Tên dự án không được để trống.';
-            }
-            if (empty($this->get('assigned_by'))) {
-                $errors['assigned_by'] = 'Assigned By không được để trống.';
-            }
             if (empty($this->get('status'))) {
-                $errors['status'] = 'Trạng thái task không được để trống.';
-            }
-            if (empty($this->get('start_date'))) {
-                $errors['start_date'] = 'Ngày bắt đầu task không được để trống.';
-            }
-            if (empty($this->get('end_date'))) {
-                $errors['end_date'] = 'Ngày kết thúc task không được để trống.';
+                $errors['status'] = 'Tên dự án không được để trống.';
             }
             $start = Helper::format_date_time_local($this->get('start_date'));
             $end   = Helper::format_date_time_local($this->get('end_date'));

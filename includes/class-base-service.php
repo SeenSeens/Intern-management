@@ -32,6 +32,10 @@ class BaseService implements BaseServiceInterface {
         return $this->repository->delete($id);
     }
 
+    public function delete_where(array $conditions) {
+        return $this->delete_where($conditions);
+    }
+
     // Pagination Interface
     public function offset_paginate(int $page = 1 , int $perPage = 10, array $filters = []){
         return $this->repository->offset_paginate($page, $perPage, $filters);

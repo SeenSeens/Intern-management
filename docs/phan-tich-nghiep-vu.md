@@ -61,5 +61,8 @@ Hệ thống sử dụng Custom Capabilities để kiểm soát quyền hạn ch
 ## 5. Cấu trúc Backend (Layered Architecture)
 Hệ thống tuân thủ mô hình phân lớp rành mạch để dễ dàng nâng cấp, bảo trì và cung cấp dữ liệu sạch cho Frontend.
 
-| Tầng (Layer)     | Trách nhiệm                                                                              |
-|:-----------------|:-----------------------------------------------------------------------------------------|
+| Tầng (Layer)   | Trách nhiệm          |
+|:---------------|:---------------------|
+| Controller     | Nhận request         |
+| Action/Service | Xử lý business logic |
+| Repository     | Tương tác database   |
